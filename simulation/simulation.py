@@ -8,16 +8,17 @@ import time
 class Simulation:
     """The Simulation class is an environment for running consecutive creature walking simulations optimally.
     It is suited for simulating one creature at a time. The reset_state method should be called after each individual run.
+    For parallel processing, separate Simulation instances should be used.
     """
     def __init__(self, simulation_type: int, creature_path: Path, settle_steps: int = 120, time_step: float = 1./240.):
         """Initializes the Simulation class.
 
-            :param (int) simulation_type: If the simulation should include a graphical representation (p.GUI)
+            :param int simulation_type: If the simulation should include a graphical representation (p.GUI)
                                             or not (p.DIRECT). Use p.DIRECT for performance.
-            :param (Path) creature_path: A path to the .urdf creature file that should be used.
-            :param (int, optional) settle_steps: How many simulation steps to wait for the creature to reach a stable state.
+            :param Path creature_path: A path to the .urdf creature file that should be used.
+            :param int, optional settle_steps: How many simulation steps to wait for the creature to reach a stable state.
                                             Probably not necessary to change the default. Defaults to 120.
-            :param (float, optional) time_step: How much time should one tick represent (NOT how much real time should it take). Defaults to 1./240..
+            :param float, optional time_step: How much time should one tick represent (NOT how much real time should it take). Defaults to 1./240..
         """
         if simulation_type not in (p.GUI, p.DIRECT):
             raise ValueError(f"Invalid simulation_type. "
@@ -27,11 +28,12 @@ class Simulation:
         self.time_step = time_step
 
         self.client_id = p.connect(simulation_type) 
+        
+        p.setRealTimeSimulation(0, physicsClientId=self.client_id)
+        p.setTimeStep(self.time_step, physicsClientId=self.client_id)
 
         # enable access to default pybullet assets
         p.setAdditionalSearchPath(pybullet_data.getDataPath(), physicsClientId=self.client_id)
-        
-        p.setRealTimeSimulation(0)
         
         # turn gravity off to measure the creature's bounding box
         p.setGravity(0, 0, 0, physicsClientId=self.client_id)
@@ -91,6 +93,9 @@ class Simulation:
 
         self.num_revolute = len(self.revolute_joints)
         self.num_spherical = len(self.spherical_joints)
+        
+        # initialize the tick count to measure how many ticks passed
+        self.tick_count = 0
 
     
     def step(self):
@@ -98,6 +103,9 @@ class Simulation:
         Call this after applying all desired joint movements for that step.
         """
         p.stepSimulation(physicsClientId=self.client_id)
+        
+        self.tick_count += 1
+        
         if self.gui_enabled:
             time.sleep(self.time_step)
     
@@ -112,12 +120,21 @@ class Simulation:
         return np.array(pos, dtype=np.float64)
     
     
+    def get_tick_count(self) -> int:
+        """Returns the tick count since the start of the current run. The tick count can be thought of as the 'time passed'.
+        It is reset every time reset_state is called.
+
+        :return int: An int representing the 'time passed' since the start of the run.
+        """
+        return self.tick_count
+    
+    
     def moveRevolute(self, joint_ids: npt.NDArray[np.int32], torques: npt.NDArray[np.float64]):
         """
         Applies torques to a specified list of revolute (1-DOF) joints.
         
-        :param (npt.NDArray[np.int32]) joint_ids: A 1D NumPy array of joint indices.
-        :param (npt.NDArray[np.float64]) torques: A 1D NumPy array of torque values. Must have the same
+        :param npt.NDArray[np.int32] joint_ids: A 1D NumPy array of joint indices.
+        :param npt.NDArray[np.float64] torques: A 1D NumPy array of torque values. Must have the same
                         length as joint_ids.
         """
         if joint_ids.shape[0] == 0:
@@ -140,8 +157,8 @@ class Simulation:
         """
         Applies torques to a specified list of spherical (3-DOF) joints.
         
-        :param (npt.NDArray[np.int32]) joint_ids: A 1D NumPy array of joint indices.
-        :param (npt.NDArray[np.float64]) torques: A 2D NumPy array of torque vectors. Must have shape
+        :param npt.NDArray[np.int32] joint_ids: A 1D NumPy array of joint indices.
+        :param npt.NDArray[np.float64] torques: A 2D NumPy array of torque vectors. Must have shape
                         (len(joint_ids), 3).
         """
         if joint_ids.shape[0] == 0:
@@ -170,6 +187,7 @@ class Simulation:
         """Resets the simulation to the saved 'settled' start state.
         Call this after having finished the simulation for a single individual."""
         p.restoreState(self.startStateId, physicsClientId=self.client_id)
+        self.tick_count = 0
 
 
     def terminate(self):
