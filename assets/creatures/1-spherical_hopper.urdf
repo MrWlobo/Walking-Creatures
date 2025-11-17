@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<robot name="spherical_hopper">
+<robot name="1-spherical_hopper">
   <link name="base_link">
     <inertial>
       <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -49,6 +49,6 @@
   <joint name="spine_joint" type="spherical">
     <origin xyz="0 0 0.35" rpy="0 0 0"/> <parent link="base_link"/>
     <child link="upper_body"/>
-    <limit lower="-1.57 -1.57 -1.57" upper="1.57 1.57 1.57" effort="20" velocity="10"/>
+    <!-- <limit lower="-1.57 -1.57 -1.57" upper="1.57 1.57 1.57" effort="20" velocity="10"/> -->
   </joint>
 </robot>

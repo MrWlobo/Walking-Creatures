@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<robot name="6_revolute_biped">
+<robot name="6-revolute_biped">
 
   <material name="blue">
     <color rgba="0.0 0.0 0.8 1.0"/>

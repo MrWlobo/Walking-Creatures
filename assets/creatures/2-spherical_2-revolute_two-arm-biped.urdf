@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<robot name="two_arm_biped">
+<robot name="2-spherical_2-revolute_two-arm-biped">
   <link name="torso">
     <inertial><origin xyz="0 0 0"/><mass value="2"/><inertia ixx="0.02" ixy="0" ixz="0" iyy="0.02" iyz="0" izz="0.02"/></inertial>
     <visual><origin xyz="0 0 0"/><geometry><sphere radius="0.18"/></geometry><material name="torso_gray"><color rgba="0.6 0.6 0.6 1"/></material></visual>
