@@ -1,0 +1,186 @@
+import math
+import random
+from typing import Callable
+from collections import defaultdict, deque
+
+class NeuralNetwork:
+    """
+    A NEAT-style neural network implementation with support for:
+    - Arbitrary hidden nodes
+    - Connection and node mutations with global innovation tracking
+    - Forward propagation using topological sorting
+    - 1D and 3D output units
+    """
+
+    innov_table = {} # connection: innov number
+    connection_split_table = {} # connection: id of node that splits the connection
+
+    def __init__(self, input_units: int, units_1d: int, units_3d: int, activation_function: Callable = math.tanh):
+        """
+        Initialize the neural network with input and output units.
+
+        Args:
+            input_units (int): Number of input neurons.
+            units_1d (int): Number of 1D output units.
+            units_3d (int): Number of 3D output units (each counts as 3 neurons).
+            activation_function (Callable): Activation function applied to hidden/output nodes.
+        """
+
+        self.input_units = input_units
+        self.output_units = units_1d + 3 * units_3d
+        self.nodes = {**{k: "input" for k in range(self.input_units)}, **{k: "output" for k in range(self.input_units, self.output_units + self.input_units)}}
+        self.connections = {}
+        self.activation_function = activation_function
+
+        for input in range(self.input_units):
+            for output in range(self.input_units, self.output_units + self.input_units):
+                # Innov number is used to identify the same connection across different networks
+                if (input, output) not in NeuralNetwork.innov_table:
+                    NeuralNetwork.innov_table[(input, output)] = max(NeuralNetwork.innov_table.values(), default=-1) + 1
+                self.connections[(input, output)] = {"weight": random.uniform(-1,1), "enabled": True, "innov": NeuralNetwork.innov_table[(input, output)]}
+
+    def change_weight(self, connection: tuple[int, int], new_weight: float) -> None:
+        """
+        Update the weight of an existing connection.
+
+        Args:
+            connection (tuple[int, int]): Source and target node indices.
+            new_weight (float): New weight value.
+        """
+
+        self.connections[connection]["weight"] = new_weight
+
+    def add_connection(self, connection) -> bool:
+        """
+        Add a new connection between nodes if allowed.
+
+        Args:
+            connection (tuple[int, int]): Source and target node indices.
+
+        Returns:
+            bool: True if connection was successfully added, False otherwise.
+        """
+
+        added_connection = True
+        if connection in self.connections:
+            added_connection = False
+
+        if (connection[0] not in self.nodes or connection[1] not in self.nodes) and added_connection:
+            added_connection = False
+
+        if (self.nodes[connection[0]] == "output" or self.nodes[connection[1]] == "input") and added_connection:
+            added_connection = False
+
+        if self.nodes[connection[0]] == "hidden" and self.nodes[connection[1]] == "hidden" and connection[0] > connection[1] and added_connection:
+            added_connection = False
+
+        if added_connection:
+            if connection not in NeuralNetwork.innov_table:
+                NeuralNetwork.innov_table[connection] = max(NeuralNetwork.innov_table.values(), default=-1) + 1
+            self.connections[connection] = {"weight": random.uniform(-1,1), "enabled": True, "innov": NeuralNetwork.innov_table[connection]}
+
+        return added_connection
+
+    def add_node_to_connection(self, connection) -> bool:
+        """
+        Split an existing connection by adding a hidden node.
+
+        Args:
+            connection (tuple[int, int]): Connection to split.
+
+        Returns:
+            bool: True if a node was successfully added, False otherwise.
+        """
+
+        added_node = True
+
+        if connection not in self.connections:
+            added_node = False
+
+        if added_node:
+            # Add a new node to the network, check its index in the global table, create it if it does not exist.
+            if connection not in NeuralNetwork.connection_split_table:
+                NeuralNetwork.connection_split_table[connection] = max(NeuralNetwork.connection_split_table.values(), default=len(self.nodes)-1) + 1
+            node = NeuralNetwork.connection_split_table[connection]
+            self.nodes[node] = "hidden"
+
+            # Disable the original connection
+            self.connections[connection]["enabled"] = False
+
+            # Create new connections such that they do not change networks previous behaviour (hence 1.0 weight).
+            if (connection[0], node) not in NeuralNetwork.innov_table:
+                NeuralNetwork.innov_table[(connection[0], node)] = max(NeuralNetwork.innov_table.values(), default=-1) + 1
+            self.connections[(connection[0], node)] = {"weight": self.connections[connection]["weight"], "enabled": True, "innov": NeuralNetwork.innov_table[(connection[0], node)]}
+
+            if (node, connection[1]) not in NeuralNetwork.innov_table:
+                NeuralNetwork.innov_table[(node, connection[1])] = max(NeuralNetwork.innov_table.values(), default=-1) + 1
+            self.connections[(node, connection[1])] = {"weight": 1.0, "enabled": True, "innov": NeuralNetwork.innov_table[(node, connection[1])]}
+
+        return added_node
+
+    def forward(self, input_values: list[float]) -> list[float]:
+        """
+        Perform a forward pass through the network.
+
+        Args:
+            input_values (list[float]): Input vector of length equal to number of input units.
+
+        Returns:
+            list[float]: Output vector after forward propagation.
+        """
+        node_values = {n: 0.0 for n in self.nodes}
+
+        # Assign input values
+        input_nodes = [n for n, t in self.nodes.items() if t == "input"]
+        for n, val in zip(input_nodes, input_values):
+            node_values[n] = val
+
+        # Topological sort based on enabled connections
+        order = self._topological_sort()
+
+        # Compute node activations
+        for node in order:
+            if self.nodes[node] == "input":
+                continue
+            total = sum(
+                node_values[src] * conn["weight"]
+                for (src, tgt), conn in self.connections.items()
+                if tgt == node and conn["enabled"]
+            )
+            node_values[node] = self.activation_function(total)
+
+        # Collect outputs
+        output_nodes = [n for n, t in self.nodes.items() if t == "output"]
+        return [node_values[n] for n in output_nodes]
+
+    def _topological_sort(self):
+        """
+        Perform a topological sort of the network nodes based on enabled connections.
+
+        Returns:
+            list[int]: Nodes in topologically sorted order.
+        """
+        indegree = {n: 0 for n in self.nodes}
+        adjacency = defaultdict(list)
+        for (src, tgt), conn in self.connections.items():
+            if conn["enabled"]:
+                adjacency[src].append(tgt)
+                indegree[tgt] += 1
+
+        queue = deque([n for n in self.nodes if indegree[n] == 0])
+        order = []
+        while queue:
+            n = queue.popleft()
+            order.append(n)
+            for m in adjacency[n]:
+                indegree[m] -= 1
+                if indegree[m] == 0:
+                    queue.append(m)
+        return order
+
+    def __repr__(self):
+        result = ""
+        for key in self.connections:
+            result += f"{key}: {self.connections[key]}\n"
+
+        return result
