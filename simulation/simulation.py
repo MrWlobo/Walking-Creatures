@@ -48,6 +48,42 @@ class Simulation:
                                     start_orientation, 
                                     physicsClientId=self.client_id)
 
+        revolute_joints_list = []
+        spherical_joints_list = []
+        for i in range(p.getNumJoints(self.creatureId, physicsClientId=self.client_id)):
+            info = p.getJointInfo(self.creatureId, i, physicsClientId=self.client_id)
+            joint_type = info[2] 
+
+            if joint_type == p.JOINT_SPHERICAL:
+                spherical_joints_list.append(i)
+            elif joint_type != p.JOINT_FIXED:
+                revolute_joints_list.append(i)
+        
+        self.revolute_joints: npt.NDArray[np.int32] = np.array(revolute_joints_list, dtype=np.int32)
+        self.spherical_joints: npt.NDArray[np.int32] = np.array(spherical_joints_list, dtype=np.int32)
+
+        self.num_revolute = len(self.revolute_joints)
+        self.num_spherical = len(self.spherical_joints)
+        
+        # disable default motors for revolute joints
+        if self.num_revolute > 0:
+            p.setJointMotorControlArray(
+                self.creatureId,
+                self.revolute_joints,
+                p.VELOCITY_CONTROL,
+                forces=np.zeros(self.num_revolute)
+            )
+
+        # disable default motors for spherical joints
+        for j_id in self.spherical_joints:
+            p.setJointMotorControlMultiDof(
+                self.creatureId, 
+                j_id,
+                p.TORQUE_CONTROL, 
+                force=np.zeros((3)),
+                physicsClientId=self.client_id
+            )
+
         # perform one simulation step to register all link AABBs
         p.stepSimulation(physicsClientId=self.client_id)
 
@@ -77,24 +113,7 @@ class Simulation:
         # save the stable starting state to use after resets
         self.startStateId = p.saveState(physicsClientId=self.client_id)
         
-        revolute_joints_list = []
-        spherical_joints_list = []
-        for i in range(p.getNumJoints(self.creatureId, physicsClientId=self.client_id)):
-            info = p.getJointInfo(self.creatureId, i, physicsClientId=self.client_id)
-            joint_type = info[2] 
-
-            if joint_type == p.JOINT_SPHERICAL:
-                spherical_joints_list.append(i)
-            elif joint_type != p.JOINT_FIXED:
-                revolute_joints_list.append(i)
-        
-        self.revolute_joints: npt.NDArray[np.int32] = np.array(revolute_joints_list, dtype=np.int32)
-        self.spherical_joints: npt.NDArray[np.int32] = np.array(spherical_joints_list, dtype=np.int32)
-
-        self.num_revolute = len(self.revolute_joints)
-        self.num_spherical = len(self.spherical_joints)
-        
-        # initialize the tick count to measure how many ticks passed
+        # initialize the tick count to measure how many ticks have passed
         self.tick_count = 0
 
     
@@ -110,14 +129,64 @@ class Simulation:
             time.sleep(self.time_step)
     
     
-    def get_creature_position(self) -> npt.NDArray[np.float64]:
+    def get_base_state(self) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
         """
-        Gets the position of the creature's base (torso).
+        Gets the position (relative to the origin) and orientation (Euler angles) of the creature's base.
         
-        :return npt.NDArray[np.float64]: A 1D NumPy array [x, y, z] of the base position.
+        :return: A tuple (position, orientation_euler)
+                position: 1D NumPy array [x, y, z]
+                orientation_euler: 1D NumPy array [roll, pitch, yaw] in radians
         """
-        pos, _ = p.getBasePositionAndOrientation(self.creatureId, physicsClientId=self.client_id)
-        return np.array(pos, dtype=np.float64)
+        pos, orn_quat = p.getBasePositionAndOrientation(self.creatureId, physicsClientId=self.client_id)
+        orn_euler = p.getEulerFromQuaternion(orn_quat, physicsClientId=self.client_id)
+        
+        return np.array(pos, dtype=np.float64), np.array(orn_euler, dtype=np.float64)
+    
+    
+    def get_revolute_joint_states(self) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
+        """
+        Gets the state (position, velocity) for all revolute joints.
+        
+        :return: A tuple (positions, velocities)
+                positions: 1D NumPy array [angle1, angle2, ...] in radians
+                velocities: 1D NumPy array [vel1, vel2, ...] in rad/s
+        """
+        if self.num_revolute == 0:
+            return np.empty(0), np.empty(0)
+            
+        states = p.getJointStates(self.creatureId, 
+                                self.revolute_joints, 
+                                physicsClientId=self.client_id)
+        
+        # state[0] is position, state[1] is velocity
+        positions = [state[0] for state in states]
+        velocities = [state[1] for state in states]
+        return np.array(positions, dtype=np.float64), np.array(velocities, dtype=np.float64)
+    
+    
+    def get_spherical_joint_states(self) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
+        """
+        Gets the state (position, velocity) for all spherical joints.
+        
+        :return: A tuple (positions_euler, velocities)
+                positions_euler: 2D NumPy array, shape (N, 3) [roll, pitch, yaw]
+                velocities: 2D NumPy array, shape (N, 3) [vel_x, vel_y, vel_z]
+        """
+        if self.num_spherical == 0:
+            return np.empty((0, 3)), np.empty((0, 3))
+            
+        states = p.getJointStatesMultiDof(self.creatureId, 
+                                        self.spherical_joints, 
+                                        physicsClientId=self.client_id)
+        
+        # state[0] is position (quat [x,y,z,w]), state[1] is velocity (3D vec)
+        positions_quat = [state[0] for state in states]
+        velocities = [state[1] for state in states]
+        
+        positions_euler = [p.getEulerFromQuaternion(quat, physicsClientId=self.client_id) 
+                            for quat in positions_quat]
+        
+        return np.array(positions_euler, dtype=np.float64), np.array(velocities, dtype=np.float64)
     
     
     def get_tick_count(self) -> int:
@@ -139,6 +208,10 @@ class Simulation:
         """
         if joint_ids.shape[0] == 0:
             return
+        
+        if any([i not in self.revolute_joints for i in joint_ids]):
+            raise ValueError(f"joint_ids must represent revolute joints, not spherical."
+                            f" Got {joint_ids}.")
             
         if joint_ids.shape[0] != torques.shape[0]:
             raise ValueError(f"joint_ids and torques arrays must have the same length. "
@@ -163,6 +236,10 @@ class Simulation:
         """
         if joint_ids.shape[0] == 0:
             return
+        
+        if any([i not in self.spherical_joints for i in joint_ids]):
+            raise ValueError(f"joint_ids must represent spherical joints, not revolute."
+                            f" Got {joint_ids}.")
 
         if joint_ids.shape[0] != torques.shape[0]:
             raise ValueError(f"joint_ids and torques arrays must have the same length (dim 0). "
@@ -172,15 +249,14 @@ class Simulation:
             raise ValueError(f"Torques array has wrong shape. "
                             f"Expected (N, 3) but got {torques.shape}")
         
-        torques_flat = torques.flatten()
-        
-        p.setJointMotorControlMultiDofArray(
-            bodyUniqueId=self.creatureId,
-            jointIndices=joint_ids,
-            controlMode=p.TORQUE_CONTROL,
-            forces=torques_flat,
-            physicsClientId=self.client_id
-        )
+        for j_id, t_vec in zip(joint_ids, torques):
+            p.setJointMotorControlMultiDof(
+                self.creatureId, 
+                j_id,
+                p.TORQUE_CONTROL, 
+                force=t_vec,
+                physicsClientId=self.client_id
+            )
     
     
     def reset_state(self):
