@@ -142,7 +142,7 @@ def mutate_node(connection: tuple[int, int], individual: NeuralNetwork) -> bool:
 
     mutated = True
     if connection in individual.connections:
-        mutated = individual.add_connection(connection)
+        mutated = individual.add_node_to_connection(connection)
 
     return mutated
 
