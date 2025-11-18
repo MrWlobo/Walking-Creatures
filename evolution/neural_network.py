@@ -12,10 +12,9 @@ class NeuralNetwork:
     - 1D and 3D output units
     """
 
-    innov_table = {} # connection: innov number
     connection_split_table = {} # connection: id of node that splits the connection
 
-    def __init__(self, input_units: int, units_1d: int, units_3d: int, activation_function: Callable = math.tanh):
+    def __init__(self, input_units: int = None, units_1d: int = None, units_3d: int = None, activation_function: Callable = math.tanh, nodes: dict[int, str] = None, connections: dict[tuple[int, int], dict[str, float | bool]] = None):
         """
         Initialize the neural network with input and output units.
 
@@ -26,18 +25,21 @@ class NeuralNetwork:
             activation_function (Callable): Activation function applied to hidden/output nodes.
         """
 
-        self.input_units = input_units
-        self.output_units = units_1d + 3 * units_3d
-        self.nodes = {**{k: "input" for k in range(self.input_units)}, **{k: "output" for k in range(self.input_units, self.output_units + self.input_units)}}
-        self.connections = {}
-        self.activation_function = activation_function
+        if nodes is not None and connections is not None:
+            self.nodes = nodes
+            self.connections = connections
+            self.input_units = len([n for n, t in nodes.items() if t == "input"])
+            self.output_units = len([n for n, t in nodes.items() if t == "output"])
+        else:
+            self.input_units = input_units
+            self.output_units = units_1d + 3 * units_3d
+            self.nodes = {**{k: "input" for k in range(self.input_units)}, **{k: "output" for k in range(self.input_units, self.output_units + self.input_units)}}
+            self.connections = {}
+            self.activation_function = activation_function
 
-        for input in range(self.input_units):
-            for output in range(self.input_units, self.output_units + self.input_units):
-                # Innov number is used to identify the same connection across different networks
-                if (input, output) not in NeuralNetwork.innov_table:
-                    NeuralNetwork.innov_table[(input, output)] = max(NeuralNetwork.innov_table.values(), default=-1) + 1
-                self.connections[(input, output)] = {"weight": random.uniform(-1,1), "enabled": True, "innov": NeuralNetwork.innov_table[(input, output)]}
+            for input in range(self.input_units):
+                for output in range(self.input_units, self.output_units + self.input_units):
+                    self.connections[(input, output)] = {"weight": random.uniform(-1,1), "enabled": True if random.randint(0, 1) == 1 else False}
 
     def change_weight(self, connection: tuple[int, int], new_weight: float) -> None:
         """
@@ -49,6 +51,19 @@ class NeuralNetwork:
         """
 
         self.connections[connection]["weight"] = new_weight
+
+    def toggle_connection(self, connection) -> None:
+        """
+        Toggle the enabled/disabled state of a connection.
+
+        Args:
+            connection (tuple[int, int]): A tuple representing the source and target node indices
+                                          of the connection to toggle.
+
+        Modifies:
+            self.connections[connection]["enabled"]: Flips True to False or False to True.
+        """
+        self.connections[connection]["enabled"] = not self.connections[connection]["enabled"]
 
     def add_connection(self, connection) -> bool:
         """
@@ -75,9 +90,7 @@ class NeuralNetwork:
             added_connection = False
 
         if added_connection:
-            if connection not in NeuralNetwork.innov_table:
-                NeuralNetwork.innov_table[connection] = max(NeuralNetwork.innov_table.values(), default=-1) + 1
-            self.connections[connection] = {"weight": random.uniform(-1,1), "enabled": True, "innov": NeuralNetwork.innov_table[connection]}
+            self.connections[connection] = {"weight": random.uniform(-1,1), "enabled": True}
 
         return added_connection
 
@@ -108,13 +121,8 @@ class NeuralNetwork:
             self.connections[connection]["enabled"] = False
 
             # Create new connections such that they do not change networks previous behaviour (hence 1.0 weight).
-            if (connection[0], node) not in NeuralNetwork.innov_table:
-                NeuralNetwork.innov_table[(connection[0], node)] = max(NeuralNetwork.innov_table.values(), default=-1) + 1
-            self.connections[(connection[0], node)] = {"weight": self.connections[connection]["weight"], "enabled": True, "innov": NeuralNetwork.innov_table[(connection[0], node)]}
-
-            if (node, connection[1]) not in NeuralNetwork.innov_table:
-                NeuralNetwork.innov_table[(node, connection[1])] = max(NeuralNetwork.innov_table.values(), default=-1) + 1
-            self.connections[(node, connection[1])] = {"weight": 1.0, "enabled": True, "innov": NeuralNetwork.innov_table[(node, connection[1])]}
+            self.connections[(connection[0], node)] = {"weight": self.connections[connection]["weight"], "enabled": True}
+            self.connections[(node, connection[1])] = {"weight": 1.0, "enabled": True}
 
         return added_node
 
