@@ -1,7 +1,5 @@
 import random
 import copy
-
-from evolution.fitness import XDistanceFitness
 from evolution.neural_network import NeuralNetwork
 
 def generate_random(input_units, units_1d, units_3d) -> NeuralNetwork:
@@ -20,7 +18,7 @@ def generate_random(input_units, units_1d, units_3d) -> NeuralNetwork:
 
     return NeuralNetwork(input_units, units_1d, units_3d)
 
-def crossover(parent1: NeuralNetwork, parent2: NeuralNetwork, p1_fitness: float, p2_fitness: float) -> NeuralNetwork:
+def crossover(parent1: NeuralNetwork, parent2: NeuralNetwork) -> NeuralNetwork:
     """
     Perform NEAT-style crossover between two parent networks to produce a child network.
 
@@ -37,8 +35,8 @@ def crossover(parent1: NeuralNetwork, parent2: NeuralNetwork, p1_fitness: float,
         NeuralNetwork: Child network created from the crossover of the two parents.
     """
 
-    fitter = parent1 if p1_fitness > p2_fitness else parent2
-    other = parent1 if p1_fitness <= p2_fitness else parent2
+    fitter = parent1 if parent1.fitness_value > parent2.fitness_value  else parent2
+    other = parent1 if parent1.fitness_value  <= parent2.fitness_value  else parent2
 
     new_nodes = copy.deepcopy(fitter.nodes)
     new_connections = {}
@@ -54,7 +52,16 @@ def crossover(parent1: NeuralNetwork, parent2: NeuralNetwork, p1_fitness: float,
     child = NeuralNetwork(nodes=new_nodes, connections=new_connections)
     return child
 
-def mutation(probabilities: list[int], individual: NeuralNetwork):
+def mutation(probabilities: list[int], individual: NeuralNetwork) -> None:
+    """
+    Perform a mutation on an individual neural network based on given probabilities.
+
+    Args:
+        probabilities (list[int]): List of 3 integers representing percent chance for:
+            [0] mutate weight, [1] mutate connection, [2] mutate node.
+            Must sum to 100.
+        individual (NeuralNetwork): The neural network to mutate.
+    """
 
     if len(probabilities) != 3:
         raise ValueError("There should be exactly 3 values in probabilities.")
@@ -84,13 +91,35 @@ def mutation(probabilities: list[int], individual: NeuralNetwork):
             connection = random.choice(list(individual.connections.keys()))
             success = mutate_node(connection, individual)
 
-def mutate_weight(connection: tuple[int, int], individual: NeuralNetwork):
+def mutate_weight(connection: tuple[int, int], individual: NeuralNetwork) -> None:
+    """
+    Mutate the weight of a given connection in a neural network.
+
+    Args:
+        connection (tuple[int, int]): The (source, target) node indices of the connection.
+        individual (NeuralNetwork): Neural network to mutate.
+
+    Behavior:
+        - 90% chance: small perturbation [-0.1, 0.1] added to weight
+        - 10% chance: assign completely new random weight in [-1.0, 1.0]
+    """
     if random.random() < 0.9:
         individual.connections[connection]["weight"] += random.uniform(-0.1, 0.1)
     else:
         individual.connections[connection]["weight"] = random.uniform(-1.0, 1.0)
 
 def mutate_connection(connection: tuple[int, int], individual: NeuralNetwork) -> bool:
+    """
+    Mutate a connection by either adding a new connection or toggling an existing one.
+
+    Args:
+        connection (tuple[int, int]): The (source, target) node indices.
+        individual (NeuralNetwork): Neural network to mutate.
+
+    Returns:
+        bool: True if mutation succeeded (connection added or toggled), False otherwise.
+    """
+
     mutated = True
     if connection not in individual.connections:
         mutated = individual.add_connection(connection)
@@ -99,12 +128,50 @@ def mutate_connection(connection: tuple[int, int], individual: NeuralNetwork) ->
 
     return mutated
 
-def mutate_node(connection: tuple[int, int], individual: NeuralNetwork):
+def mutate_node(connection: tuple[int, int], individual: NeuralNetwork) -> bool:
+    """
+    Mutate a network by splitting an existing connection to add a new hidden node.
+
+    Args:
+        connection (tuple[int, int]): The (source, target) node indices of the connection.
+        individual (NeuralNetwork): Neural network to mutate.
+
+    Returns:
+        bool: True if a new node was successfully added, False otherwise.
+    """
+
     mutated = True
     if connection in individual.connections:
         mutated = individual.add_connection(connection)
 
     return mutated
 
-def selection():
-    pass
+def selection(population: list[NeuralNetwork], tournament_size: int) -> NeuralNetwork:
+    """
+    Select a neural network from a population using tournament selection with fitness-proportional probability.
+
+    Args:
+        population (list[NeuralNetwork]): The population of neural networks to choose from.
+        tournament_size (int): Number of networks to randomly select for the tournament.
+
+    Raises:
+        ValueError: If tournament_size is larger than the population.
+
+    Returns:
+        NeuralNetwork: The selected network based on fitness.
+    """
+
+    if tournament_size > len(population):
+        raise ValueError("Tournament can't be larger than the entire population.")
+
+    tournament = random.sample(population, tournament_size)
+    fitness_sum = sum([x.fitness_value for x in tournament])
+    selected_value = random.uniform(0, fitness_sum)
+
+    running_sum = 0
+    for net in tournament:
+        running_sum += net.fitness_value
+        if selected_value <= running_sum:
+            return net
+
+    return tournament[-1]

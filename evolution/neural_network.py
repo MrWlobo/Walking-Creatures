@@ -30,12 +30,14 @@ class NeuralNetwork:
             self.connections = connections
             self.input_units = len([n for n, t in nodes.items() if t == "input"])
             self.output_units = len([n for n, t in nodes.items() if t == "output"])
+            self.fitness_value = 0
         else:
             self.input_units = input_units
             self.output_units = units_1d + 3 * units_3d
             self.nodes = {**{k: "input" for k in range(self.input_units)}, **{k: "output" for k in range(self.input_units, self.output_units + self.input_units)}}
             self.connections = {}
             self.activation_function = activation_function
+            self.fitness_value = 0
 
             for input in range(self.input_units):
                 for output in range(self.input_units, self.output_units + self.input_units):
@@ -159,6 +161,9 @@ class NeuralNetwork:
         # Collect outputs
         output_nodes = [n for n, t in self.nodes.items() if t == "output"]
         return [node_values[n] for n in output_nodes]
+
+    def calculate_fitness(self):
+        pass
 
     def _topological_sort(self):
         """
