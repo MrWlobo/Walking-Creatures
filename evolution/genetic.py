@@ -54,8 +54,57 @@ def crossover(parent1: NeuralNetwork, parent2: NeuralNetwork, p1_fitness: float,
     child = NeuralNetwork(nodes=new_nodes, connections=new_connections)
     return child
 
-def mutation():
-    pass
+def mutation(probabilities: list[int], individual: NeuralNetwork):
+
+    if len(probabilities) != 3:
+        raise ValueError("There should be exactly 3 values in probabilities.")
+
+    if sum(probabilities) != 100:
+        raise ValueError("Probabilities should sum up to 100.")
+
+    selected = random.uniform(0, 100)
+
+    if selected <= probabilities[0]:
+        connection = random.choice(list(individual.connections.keys()))
+        mutate_weight(connection, individual)
+
+    elif selected <= (probabilities[0] + probabilities[1]):
+        success = False
+        while not success:
+            node_pairs = [(a, b) for a in individual.nodes for b in individual.nodes
+                          if a != b]
+            if not node_pairs:
+                break
+            connection = random.choice(node_pairs)
+            success = mutate_connection(connection, individual)
+
+    else:
+        success = False
+        while not success:
+            connection = random.choice(list(individual.connections.keys()))
+            success = mutate_node(connection, individual)
+
+def mutate_weight(connection: tuple[int, int], individual: NeuralNetwork):
+    if random.random() < 0.9:
+        individual.connections[connection]["weight"] += random.uniform(-0.1, 0.1)
+    else:
+        individual.connections[connection]["weight"] = random.uniform(-1.0, 1.0)
+
+def mutate_connection(connection: tuple[int, int], individual: NeuralNetwork) -> bool:
+    mutated = True
+    if connection not in individual.connections:
+        mutated = individual.add_connection(connection)
+    else:
+        individual.toggle_connection(connection)
+
+    return mutated
+
+def mutate_node(connection: tuple[int, int], individual: NeuralNetwork):
+    mutated = True
+    if connection in individual.connections:
+        mutated = individual.add_connection(connection)
+
+    return mutated
 
 def selection():
     pass

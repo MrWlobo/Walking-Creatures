@@ -76,23 +76,25 @@ class NeuralNetwork:
             bool: True if connection was successfully added, False otherwise.
         """
 
-        added_connection = True
         if connection in self.connections:
-            added_connection = False
+            return False
 
-        if (connection[0] not in self.nodes or connection[1] not in self.nodes) and added_connection:
-            added_connection = False
+        if connection[0] not in self.nodes or connection[1] not in self.nodes:
+            return False
 
-        if (self.nodes[connection[0]] == "output" or self.nodes[connection[1]] == "input") and added_connection:
-            added_connection = False
+        if self.nodes[connection[0]] == "output" or self.nodes[connection[1]] == "input":
+            return False
 
-        if self.nodes[connection[0]] == "hidden" and self.nodes[connection[1]] == "hidden" and connection[0] > connection[1] and added_connection:
-            added_connection = False
+        self.connections[connection] = {"weight": random.uniform(-1, 1), "enabled": True}
 
-        if added_connection:
-            self.connections[connection] = {"weight": random.uniform(-1,1), "enabled": True}
+        # Check for cycle
+        topo_order = self._topological_sort()
+        if len(topo_order) != len(self.nodes):
+            # Cycle detected, remove the temporary connection
+            del self.connections[connection]
+            return False
 
-        return added_connection
+        return True
 
     def add_node_to_connection(self, connection) -> bool:
         """
@@ -105,26 +107,23 @@ class NeuralNetwork:
             bool: True if a node was successfully added, False otherwise.
         """
 
-        added_node = True
-
         if connection not in self.connections:
-            added_node = False
+            return False
 
-        if added_node:
-            # Add a new node to the network, check its index in the global table, create it if it does not exist.
-            if connection not in NeuralNetwork.connection_split_table:
-                NeuralNetwork.connection_split_table[connection] = max(NeuralNetwork.connection_split_table.values(), default=len(self.nodes)-1) + 1
-            node = NeuralNetwork.connection_split_table[connection]
-            self.nodes[node] = "hidden"
+        # Add a new node to the network, check its index in the global table, create it if it does not exist.
+        if connection not in NeuralNetwork.connection_split_table:
+            NeuralNetwork.connection_split_table[connection] = max(NeuralNetwork.connection_split_table.values(), default=len(self.nodes)-1) + 1
+        node = NeuralNetwork.connection_split_table[connection]
+        self.nodes[node] = "hidden"
 
-            # Disable the original connection
-            self.connections[connection]["enabled"] = False
+        # Disable the original connection
+        self.connections[connection]["enabled"] = False
 
-            # Create new connections such that they do not change networks previous behaviour (hence 1.0 weight).
-            self.connections[(connection[0], node)] = {"weight": self.connections[connection]["weight"], "enabled": True}
-            self.connections[(node, connection[1])] = {"weight": 1.0, "enabled": True}
+        # Create new connections such that they do not change networks previous behaviour (hence 1.0 weight).
+        self.connections[(connection[0], node)] = {"weight": self.connections[connection]["weight"], "enabled": True}
+        self.connections[(node, connection[1])] = {"weight": 1.0, "enabled": True}
 
-        return added_node
+        return True
 
     def forward(self, input_values: list[float]) -> list[float]:
         """
