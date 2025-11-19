@@ -10,7 +10,17 @@ from core.types import GeneticAlgorithmParams, RunResult
 
 _worker_sim = None
 
-def run_population(population: list[NeuralNetwork], params: GeneticAlgorithmParams):
+def run_population(population: list[NeuralNetwork], params: GeneticAlgorithmParams) -> list[RunResult]:
+    """Runs creature walking simulations based on all individuals in the population and returns relevant run data.
+
+    Args:
+        population (list[NeuralNetwork]): The population of neural networks to use to run creature simulations.
+        params (GeneticAlgorithmParams): See GeneticAlgorithmParams documentation. 
+                                            The params should be consistent across the whole GA.
+
+    Returns:
+        list[RunResult]: Run data for all individuals in the population, ordered the same way as the population list.
+    """
     with multiprocessing.Pool(
         processes=params.n_processes,
         initializer=_init_process,
@@ -27,31 +37,19 @@ def run_population(population: list[NeuralNetwork], params: GeneticAlgorithmPara
     return run_results
 
 
-def _init_process(sim_type, params: GeneticAlgorithmParams):
-    """Initializes the simulation inside the worker process."""
-    global _worker_sim
+def _run_individual(indiv: NeuralNetwork, sim: Simulation, params: GeneticAlgorithmParams) -> RunResult:
+    """Runs a creature walking simulation based on an individual and returns relevant run data.
+    The function is designed to work on a perviously initialized Simulation object, for efficiency.
 
-    atexit.register(_cleanup_process)
+    Args:
+        indiv (NeuralNetwork): The individual to base the simulation on.
+        sim (Simulation): The Simulation object to use for the simulation. Due to the huge overhead of initializing the physics engine,
+                            they should be reused as much as possble.
+        params (GeneticAlgorithmParams): The parameters of the genetic algorithm. See GeneticAlgorithmParams documentation.
 
-    _worker_sim = Simulation(
-        simulation_type=sim_type,
-        creature_path=params.creature_path,
-        settle_steps=params.settle_steps,
-        time_step=params.time_step
-    )
-
-
-def _cleanup_process():
-    global _worker_sim
-    print("Cleaning")
-    _worker_sim.terminate()
-
-
-def _run_process(indiv: NeuralNetwork, params: GeneticAlgorithmParams):
-    return run_individual(indiv, _worker_sim, params)
-
-
-def run_individual(indiv: NeuralNetwork, sim: Simulation, params: GeneticAlgorithmParams):
+    Returns:
+        RunResult: Run data.
+    """
     sim.reset_state()
 
     n_revolute = sim.num_revolute
@@ -83,3 +81,27 @@ def run_individual(indiv: NeuralNetwork, sim: Simulation, params: GeneticAlgorit
         time_seconds=final_time,
         final_position=final_position
     )
+
+
+def _init_process(sim_type, params: GeneticAlgorithmParams):
+    """Initializes the simulation inside the worker process."""
+    global _worker_sim
+
+    atexit.register(_cleanup_process)
+
+    _worker_sim = Simulation(
+        simulation_type=sim_type,
+        creature_path=params.creature_path,
+        settle_steps=params.settle_steps,
+        time_step=params.time_step
+    )
+
+
+def _cleanup_process():
+    global _worker_sim
+    
+    _worker_sim.terminate()
+
+
+def _run_process(indiv: NeuralNetwork, params: GeneticAlgorithmParams):
+    return _run_individual(indiv, _worker_sim, params)

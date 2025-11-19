@@ -53,8 +53,3 @@ def deserialize_network(filename: str) -> NeuralNetwork:
     print(connections)
 
     return NeuralNetwork(nodes=nodes, connections=connections)
-
-nn = NeuralNetwork(input_units=3, units_1d=2, units_3d=1)
-serialize_network(nn, "test_individual")
-new_nn = deserialize_network("test_individual")
-visualize_neat_network(new_nn)
