@@ -1,9 +1,49 @@
-import numpy as np
+import multiprocessing
+import pybullet as p
+from pathlib import Path
+from functools import partial
 
 from evolution.neural_network import NeuralNetwork
 from simulation.simulation import Simulation
 from core.data_utils import CreatureStateGetter
 from core.types import RunResult, RunConditions
+
+
+_worker_sim = None
+
+def run_population(population: list[NeuralNetwork], creature_path: Path, state_getter: CreatureStateGetter, indiv_output_scale: float, run_condidtions: RunConditions, n_processes: int = None):
+    with multiprocessing.Pool(
+        processes=n_processes,
+        initializer=_init_process,
+        initargs=(p.DIRECT, creature_path.resolve(), 120, 1./240.,)
+    ) as pool:
+        
+        _run = partial(
+            _run_process,
+            state_getter=state_getter,
+            indiv_output_scale=indiv_output_scale,
+            run_condidtions=run_condidtions
+        )
+
+        run_results = pool.map(_run, population)
+    
+    return run_results
+
+
+def _init_process(sim_type, creature_path, settle_steps, time_step):
+    """Initializes the simulation inside the worker process."""
+    global _worker_sim
+
+    _worker_sim = Simulation(
+        simulation_type=sim_type,
+        creature_path=creature_path,
+        settle_steps=settle_steps,
+        time_step=time_step
+    )
+
+
+def _run_process(indiv: NeuralNetwork, state_getter: CreatureStateGetter, indiv_output_scale: float, run_condidtions: RunConditions):
+    return run_individual(indiv, _worker_sim, state_getter, indiv_output_scale, run_condidtions)
 
 
 def run_individual(indiv: NeuralNetwork, sim: Simulation, state_getter: CreatureStateGetter, indiv_output_scale: float, run_condidtions: RunConditions):
@@ -21,10 +61,6 @@ def run_individual(indiv: NeuralNetwork, sim: Simulation, state_getter: Creature
         
         indiv_output = indiv.forward(creature_state)
 
-        # temporary
-        indiv_output = np.array(indiv_output)
-        #
-        
         indiv_output = indiv_output * indiv_output_scale
 
         revolute_target = indiv_output[:n_revolute]
@@ -42,5 +78,3 @@ def run_individual(indiv: NeuralNetwork, sim: Simulation, state_getter: Creature
         time_seconds=final_time,
         final_position=final_position
     )
-
-
