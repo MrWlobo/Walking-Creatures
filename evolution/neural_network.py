@@ -2,7 +2,6 @@ import math
 import random
 from typing import Callable
 from collections import defaultdict, deque
-
 import numpy as np
 
 
@@ -30,10 +29,11 @@ class NeuralNetwork:
         """
 
         if nodes is not None and connections is not None:
-            self.nodes = nodes
-            self.connections = connections
             self.input_units = len([n for n, t in nodes.items() if t == "input"])
             self.output_units = len([n for n, t in nodes.items() if t == "output"])
+            self.nodes = nodes
+            self.connections = connections
+            self.activation_function = activation_function
             self.fitness_value = None
         else:
             self.input_units = input_units
