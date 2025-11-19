@@ -1,6 +1,9 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 import abc
 
-from core.types import RunResult
+if TYPE_CHECKING:
+    from core.types import RunResult
 
 
 class Fitness(abc.ABC):
