@@ -16,6 +16,7 @@ class Fitness(abc.ABC):
         :param RunResult run_result: A dataclass containing run data.
         :return float: A single float value representing the fitness.
         """
+        pass
 
 
 class XDistanceFitness(Fitness):

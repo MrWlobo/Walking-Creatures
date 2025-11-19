@@ -3,6 +3,7 @@ import random
 from typing import Callable
 from collections import defaultdict, deque
 
+
 class NeuralNetwork:
     """
     A NEAT-style neural network implementation with support for:
@@ -13,6 +14,7 @@ class NeuralNetwork:
     """
 
     connection_split_table = {} # connection: id of node that splits the connection
+
 
     def __init__(self, input_units: int = None, units_1d: int = None, units_3d: int = None, activation_function: Callable = math.tanh, nodes: dict[int, str] = None, connections: dict[tuple[int, int], dict[str, float | bool]] = None):
         """
@@ -30,18 +32,19 @@ class NeuralNetwork:
             self.connections = connections
             self.input_units = len([n for n, t in nodes.items() if t == "input"])
             self.output_units = len([n for n, t in nodes.items() if t == "output"])
-            self.fitness_value = 0
+            self.fitness_value = None
         else:
             self.input_units = input_units
             self.output_units = units_1d + 3 * units_3d
             self.nodes = {**{k: "input" for k in range(self.input_units)}, **{k: "output" for k in range(self.input_units, self.output_units + self.input_units)}}
             self.connections = {}
             self.activation_function = activation_function
-            self.fitness_value = 0
+            self.fitness_value = None
 
             for input in range(self.input_units):
                 for output in range(self.input_units, self.output_units + self.input_units):
                     self.connections[(input, output)] = {"weight": random.uniform(-1,1), "enabled": True if random.randint(0, 1) == 1 else False}
+
 
     def change_weight(self, connection: tuple[int, int], new_weight: float) -> None:
         """
@@ -54,18 +57,20 @@ class NeuralNetwork:
 
         self.connections[connection]["weight"] = new_weight
 
+
     def toggle_connection(self, connection) -> None:
         """
         Toggle the enabled/disabled state of a connection.
 
         Args:
             connection (tuple[int, int]): A tuple representing the source and target node indices
-                                          of the connection to toggle.
+                                            of the connection to toggle.
 
         Modifies:
             self.connections[connection]["enabled"]: Flips True to False or False to True.
         """
         self.connections[connection]["enabled"] = not self.connections[connection]["enabled"]
+
 
     def add_connection(self, connection) -> bool:
         """
@@ -98,6 +103,7 @@ class NeuralNetwork:
 
         return True
 
+
     def add_node_to_connection(self, connection) -> bool:
         """
         Split an existing connection by adding a hidden node.
@@ -126,6 +132,7 @@ class NeuralNetwork:
         self.connections[(node, connection[1])] = {"weight": 1.0, "enabled": True}
 
         return True
+
 
     def forward(self, input_values: list[float]) -> list[float]:
         """
@@ -162,8 +169,6 @@ class NeuralNetwork:
         output_nodes = [n for n, t in self.nodes.items() if t == "output"]
         return [node_values[n] for n in output_nodes]
 
-    def calculate_fitness(self):
-        pass
 
     def _topological_sort(self):
         """
@@ -189,6 +194,7 @@ class NeuralNetwork:
                 if indegree[m] == 0:
                     queue.append(m)
         return order
+
 
     def __repr__(self):
         result = ""

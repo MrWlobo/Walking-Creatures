@@ -2,21 +2,6 @@ import random
 import copy
 from evolution.neural_network import NeuralNetwork
 
-def generate_random(input_units, units_1d, units_3d) -> NeuralNetwork:
-    """
-    Generate a new random NEAT-style neural network.
-
-    Args:
-        input_units (int): Number of input neurons.
-        units_1d (int): Number of 1D output neurons.
-        units_3d (int): Number of 3D output neurons (each counts as 3 neurons).
-
-    Returns:
-        NeuralNetwork: A new network with fully connected input-to-output layers,
-                       with random weights and random enabled/disabled connections.
-    """
-
-    return NeuralNetwork(input_units, units_1d, units_3d)
 
 def crossover(parent1: NeuralNetwork, parent2: NeuralNetwork) -> NeuralNetwork:
     """
@@ -52,7 +37,7 @@ def crossover(parent1: NeuralNetwork, parent2: NeuralNetwork) -> NeuralNetwork:
     child = NeuralNetwork(nodes=new_nodes, connections=new_connections)
     return child
 
-def mutation(probabilities: list[int], individual: NeuralNetwork) -> None:
+def mutate(probabilities: list[int], individual: NeuralNetwork) -> None:
     """
     Perform a mutation on an individual neural network based on given probabilities.
 
@@ -73,25 +58,27 @@ def mutation(probabilities: list[int], individual: NeuralNetwork) -> None:
 
     if selected <= probabilities[0]:
         connection = random.choice(list(individual.connections.keys()))
-        mutate_weight(connection, individual)
+        _mutate_weight(connection, individual)
 
     elif selected <= (probabilities[0] + probabilities[1]):
         success = False
         while not success:
             node_pairs = [(a, b) for a in individual.nodes for b in individual.nodes
-                          if a != b]
+                        if a != b]
             if not node_pairs:
                 break
             connection = random.choice(node_pairs)
-            success = mutate_connection(connection, individual)
+            success = _mutate_connection(connection, individual)
 
     else:
         success = False
         while not success:
             connection = random.choice(list(individual.connections.keys()))
-            success = mutate_node(connection, individual)
+            success = _mutate_node(connection, individual)
 
-def mutate_weight(connection: tuple[int, int], individual: NeuralNetwork) -> None:
+###
+
+def _mutate_weight(connection: tuple[int, int], individual: NeuralNetwork) -> None:
     """
     Mutate the weight of a given connection in a neural network.
 
@@ -108,7 +95,7 @@ def mutate_weight(connection: tuple[int, int], individual: NeuralNetwork) -> Non
     else:
         individual.connections[connection]["weight"] = random.uniform(-1.0, 1.0)
 
-def mutate_connection(connection: tuple[int, int], individual: NeuralNetwork) -> bool:
+def _mutate_connection(connection: tuple[int, int], individual: NeuralNetwork) -> bool:
     """
     Mutate a connection by either adding a new connection or toggling an existing one.
 
@@ -128,7 +115,7 @@ def mutate_connection(connection: tuple[int, int], individual: NeuralNetwork) ->
 
     return mutated
 
-def mutate_node(connection: tuple[int, int], individual: NeuralNetwork) -> bool:
+def _mutate_node(connection: tuple[int, int], individual: NeuralNetwork) -> bool:
     """
     Mutate a network by splitting an existing connection to add a new hidden node.
 
@@ -145,33 +132,3 @@ def mutate_node(connection: tuple[int, int], individual: NeuralNetwork) -> bool:
         mutated = individual.add_node_to_connection(connection)
 
     return mutated
-
-def selection(population: list[NeuralNetwork], tournament_size: int) -> NeuralNetwork:
-    """
-    Select a neural network from a population using tournament selection with fitness-proportional probability.
-
-    Args:
-        population (list[NeuralNetwork]): The population of neural networks to choose from.
-        tournament_size (int): Number of networks to randomly select for the tournament.
-
-    Raises:
-        ValueError: If tournament_size is larger than the population.
-
-    Returns:
-        NeuralNetwork: The selected network based on fitness.
-    """
-
-    if tournament_size > len(population):
-        raise ValueError("Tournament can't be larger than the entire population.")
-
-    tournament = random.sample(population, tournament_size)
-    fitness_sum = sum([x.fitness_value for x in tournament])
-    selected_value = random.uniform(0, fitness_sum)
-
-    running_sum = 0
-    for net in tournament:
-        running_sum += net.fitness_value
-        if selected_value <= running_sum:
-            return net
-
-    return tournament[-1]
