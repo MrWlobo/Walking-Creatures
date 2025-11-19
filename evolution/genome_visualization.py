@@ -1,7 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 
-from evolution.genetic import mutation
+from evolution.genetic import mutate
 from evolution.neural_network import NeuralNetwork
 
 def visualize_neat_network(nn: NeuralNetwork) -> None:
@@ -54,8 +54,9 @@ def visualize_neat_network(nn: NeuralNetwork) -> None:
     plt.show()
 
 # Tests
-nn = NeuralNetwork(input_units=3, units_1d=2, units_3d=1)
-mutation([30, 70, 0], nn)
-mutation([10, 80, 10], nn)
-mutation([0, 50, 50], nn)
-visualize_neat_network(nn)
+if __name__ == "__main__":
+    nn = NeuralNetwork(input_units=3, units_1d=2, units_3d=1)
+    mutate([30, 70, 0], nn)
+    mutate([10, 80, 10], nn)
+    mutate([0, 50, 50], nn)
+    visualize_neat_network(nn)

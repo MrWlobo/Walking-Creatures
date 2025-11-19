@@ -6,7 +6,7 @@ from core.data_utils import CreatureStateGetter
 from core.types import RunResult, RunConditions
 
 
-def run_individual(indiv: NeuralNetwork, sim: Simulation, state_getter: CreatureStateGetter, run_condidtions: RunConditions):
+def run_individual(indiv: NeuralNetwork, sim: Simulation, state_getter: CreatureStateGetter, indiv_output_scale: float, run_condidtions: RunConditions):
     sim.reset_state()
 
     n_revolute = sim.num_revolute
@@ -24,6 +24,8 @@ def run_individual(indiv: NeuralNetwork, sim: Simulation, state_getter: Creature
         # temporary
         indiv_output = np.array(indiv_output)
         #
+        
+        indiv_output = indiv_output * indiv_output_scale
 
         revolute_target = indiv_output[:n_revolute]
         spherical_target = indiv_output[n_revolute:].reshape(n_spherical, 3)
