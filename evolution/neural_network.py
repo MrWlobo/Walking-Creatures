@@ -3,6 +3,8 @@ import random
 from typing import Callable
 from collections import defaultdict, deque
 
+import numpy as np
+
 
 class NeuralNetwork:
     """
@@ -134,15 +136,15 @@ class NeuralNetwork:
         return True
 
 
-    def forward(self, input_values: list[float]) -> list[float]:
+    def forward(self, input_values: np.array) -> np.array:
         """
         Perform a forward pass through the network.
 
         Args:
-            input_values (list[float]): Input vector of length equal to number of input units.
+            input_values (np.array): Input vector of length equal to number of input units.
 
         Returns:
-            list[float]: Output vector after forward propagation.
+            np.array: Output vector after forward propagation.
         """
         node_values = {n: 0.0 for n in self.nodes}
 
@@ -158,16 +160,27 @@ class NeuralNetwork:
         for node in order:
             if self.nodes[node] == "input":
                 continue
-            total = sum(
-                node_values[src] * conn["weight"]
+
+            incoming = [
+                (src, conn["weight"])
                 for (src, tgt), conn in self.connections.items()
                 if tgt == node and conn["enabled"]
-            )
+            ]
+
+            if incoming:
+                sources, weights = zip(*incoming)
+                src_vals = np.fromiter((node_values[s] for s in sources), float)
+                w = np.fromiter(weights, float)
+
+                total = np.dot(src_vals, w)
+            else:
+                total = 0.0
+
             node_values[node] = self.activation_function(total)
 
         # Collect outputs
         output_nodes = [n for n, t in self.nodes.items() if t == "output"]
-        return [node_values[n] for n in output_nodes]
+        return np.array([node_values[n] for n in output_nodes])
 
 
     def _topological_sort(self):
