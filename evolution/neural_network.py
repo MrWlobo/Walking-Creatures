@@ -45,7 +45,7 @@ class NeuralNetwork:
 
             for input in range(self.input_units):
                 for output in range(self.input_units, self.output_units + self.input_units):
-                    self.connections[(input, output)] = {"weight": random.uniform(-1,1), "enabled": True if random.randint(0, 1) == 1 else False}
+                    self.connections[(input, output)] = {"weight": random.uniform(-1,1), "enabled": random.choice([True, False])}
 
 
     def change_weight(self, connection: tuple[int, int], new_weight: float) -> None:
@@ -71,6 +71,7 @@ class NeuralNetwork:
         Modifies:
             self.connections[connection]["enabled"]: Flips True to False or False to True.
         """
+        
         self.connections[connection]["enabled"] = not self.connections[connection]["enabled"]
 
 
