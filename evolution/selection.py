@@ -77,6 +77,3 @@ class RouletteSelection(Selection):
         selected = random.choices(population, weights=weights, k=1)[0]
 
         return selected
-
-
-
