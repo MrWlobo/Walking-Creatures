@@ -1,7 +1,7 @@
 from pathlib import Path
 import networkx as nx
 import matplotlib.pyplot as plt
-from evolution.genetic import mutate
+from evolution.genetic import mutate, crossover
 from evolution.neural_network import NeuralNetwork
 
 def visualize_network(network: NeuralNetwork, filename: str, save_image: bool = False, show_image: bool = True) -> None:
@@ -92,3 +92,13 @@ def visualize_network(network: NeuralNetwork, filename: str, save_image: bool = 
 
     if show_image:
         plt.show()
+
+# Tests
+if __name__ == "__main__":
+    nn1 = NeuralNetwork(input_units=3, units_1d=1, units_3d=1)
+    nn1.fitness_value = 1
+    nn2 = NeuralNetwork(input_units=3, units_1d=1, units_3d=1)
+    nn3 = crossover(nn1, nn2)
+    visualize_network(nn1, "parent1", save_image=True)
+    visualize_network(nn2, "parent2", save_image=True)
+    visualize_network(nn3, "child", save_image=True)

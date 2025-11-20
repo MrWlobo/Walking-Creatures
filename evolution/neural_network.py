@@ -34,14 +34,14 @@ class NeuralNetwork:
             self.nodes = nodes
             self.connections = connections
             self.activation_function = activation_function
-            self.fitness_value = None
+            self.fitness_value = 0
         else:
             self.input_units = input_units
             self.output_units = units_1d + 3 * units_3d
             self.nodes = {**{k: "input" for k in range(self.input_units)}, **{k: "output" for k in range(self.input_units, self.output_units + self.input_units)}}
             self.connections = {}
             self.activation_function = activation_function
-            self.fitness_value = None
+            self.fitness_value = 0
 
             for input in range(self.input_units):
                 for output in range(self.input_units, self.output_units + self.input_units):
@@ -71,7 +71,7 @@ class NeuralNetwork:
         Modifies:
             self.connections[connection]["enabled"]: Flips True to False or False to True.
         """
-        
+
         self.connections[connection]["enabled"] = not self.connections[connection]["enabled"]
 
 

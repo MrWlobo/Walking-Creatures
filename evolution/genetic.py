@@ -20,8 +20,8 @@ def crossover(parent1: NeuralNetwork, parent2: NeuralNetwork) -> NeuralNetwork:
         NeuralNetwork: Child network created from the crossover of the two parents.
     """
 
-    fitter = parent1 if parent1.fitness_value > parent2.fitness_value  else parent2
-    other = parent1 if parent1.fitness_value  <= parent2.fitness_value  else parent2
+    fitter = parent1 if parent1.fitness_value > parent2.fitness_value else parent2
+    other = parent1 if parent1.fitness_value <= parent2.fitness_value else parent2
 
     new_nodes = copy.deepcopy(fitter.nodes)
     new_connections = {}
