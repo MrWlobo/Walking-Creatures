@@ -54,7 +54,7 @@ def mutate(probabilities: list[int], individual: NeuralNetwork) -> None:
     if sum(probabilities) != 100:
         raise ValueError("Probabilities should sum up to 100.")
 
-    selected = random.uniform(0, 100)
+    selected = random.uniform(1, 100)
 
     if selected <= probabilities[0]:
         connection = random.choice(list(individual.connections.keys()))
@@ -75,8 +75,6 @@ def mutate(probabilities: list[int], individual: NeuralNetwork) -> None:
         while not success:
             connection = random.choice(list(individual.connections.keys()))
             success = _mutate_node(connection, individual)
-
-###
 
 def _mutate_weight(connection: tuple[int, int], individual: NeuralNetwork) -> None:
     """

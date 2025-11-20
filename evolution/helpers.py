@@ -1,7 +1,5 @@
 import json
 from pathlib import Path
-
-from evolution.genome_visualization import visualize_neat_network
 from evolution.neural_network import NeuralNetwork
 
 

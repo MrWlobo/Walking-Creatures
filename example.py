@@ -11,7 +11,7 @@ from evolution.fitness import XDistanceFitness
 from core.types import GeneticAlgorithmParams, FullJointStateGetter, TimeOnlyRunConditions
 from core.orchestrate import run_population
 from evolution.population import generate_random_individual
-from evolution.genome_visualization import visualize_neat_network
+from evolution.genome_visualization import visualize_network
 
 #
 #  a temporary test file
