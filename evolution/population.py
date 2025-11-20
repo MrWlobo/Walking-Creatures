@@ -1,8 +1,7 @@
-from evolution.genetic import mutate
 from evolution.neural_network import NeuralNetwork
 
 
-def generate_random_individual(input_units: int, units_1d: int, units_3d: int, hidden: int = 0) -> NeuralNetwork:
+def generate_random_individual(input_units: int, units_1d: int, units_3d: int) -> NeuralNetwork:
     """
     Generate a new random NEAT-style neural network.
 
@@ -16,6 +15,4 @@ def generate_random_individual(input_units: int, units_1d: int, units_3d: int, h
                         with random weights and random enabled/disabled connections.
     """
     network = NeuralNetwork(input_units, units_1d, units_3d)
-    for _ in range(hidden):
-        mutate([0, 0, 100], network)
     return network
