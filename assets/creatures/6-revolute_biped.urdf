@@ -35,7 +35,7 @@
     <child link="left_thigh"/>
     <origin xyz="0 0.075 0" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
-    <limit lower="-1.57" upper="1.57" effort="100" velocity="10"/>
+    <limit effort="10000" velocity="100"/>
   </joint>
 
   <link name="left_thigh">
@@ -63,7 +63,7 @@
     <child link="left_shin"/>
     <origin xyz="0 0 -0.4" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
-    <limit lower="0" upper="1.57" effort="100" velocity="10"/>
+    <limit effort="10000" velocity="100"/>
   </joint>
 
   <link name="left_shin">
@@ -91,7 +91,7 @@
     <child link="left_foot"/>
     <origin xyz="0 0 -0.3" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
-    <limit lower="-0.785" upper="0.785" effort="100" velocity="10"/>
+    <limit effort="10000" velocity="100"/>
   </joint>
 
   <link name="left_foot">
@@ -119,7 +119,7 @@
     <child link="right_thigh"/>
     <origin xyz="0 -0.075 0" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
-    <limit lower="-1.57" upper="1.57" effort="100" velocity="10"/>
+    <limit effort="10000" velocity="100"/>
   </joint>
 
   <link name="right_thigh">
@@ -147,7 +147,7 @@
     <child link="right_shin"/>
     <origin xyz="0 0 -0.4" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
-    <limit lower="0" upper="1.57" effort="100" velocity="10"/>
+    <limit effort="10000" velocity="100"/>
   </joint>
 
   <link name="right_shin">
@@ -175,7 +175,7 @@
     <child link="right_foot"/>
     <origin xyz="0 0 -0.3" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
-    <limit lower="-0.785" upper="0.785" effort="100" velocity="10"/>
+    <limit effort="10000" velocity="100"/>
   </joint>
 
   <link name="right_foot">
