@@ -201,3 +201,49 @@ def _individuals_within_compatibility_distance(network1: NeuralNetwork, network2
     average_weight_differences = sum(weight_differences) / len(weight_differences) if weight_differences else 0
 
     return (c1 * excess_count) / normalization_value + (c2 * disjoint_count) / normalization_value + c3 * average_weight_differences < compatibility_distance
+
+def calculate_new_species_sizes(species: list[list[NeuralNetwork]]) -> list[int]:
+    """
+    Calculate the new number of individuals for each species based on adjusted fitness.
+
+    Each species’ size is determined relative to the population mean adjusted fitness:
+    - Species with above-average fitness grow.
+    - Species with below-average fitness shrink.
+    - The total number of individuals across all species remains constant.
+
+    Args:
+        species (list[list[NeuralNetwork]]): A list of species, where each species is a list of NeuralNetwork instances.
+            Each NeuralNetwork is expected to have a 'fitness_value' attribute.
+
+    Returns:
+        list[int]: A list of integers representing the new sizes of each species.
+            The sum of all integers equals the total population size.
+
+    Raises:
+        ValueError: If the input list of species is empty.
+    """
+
+    if not species:
+        raise ValueError("Number of species cannot be 0.")
+
+    population_size = sum(len(s) for s in species)
+    adjusted_fitness_values = [[individual.fitness_value / len(spc) for individual in spc] for spc in species]
+    mean_adjusted_fitness = sum([sum(values) for values in adjusted_fitness_values]) / population_size
+
+    new_sizes = []
+
+    for values in adjusted_fitness_values:
+        new_size = int(sum(values) / mean_adjusted_fitness * population_size)
+        new_sizes.append(new_size)
+
+    if sum(new_sizes) < population_size:
+        largest_species_index = 0
+        largest_species_count = 0
+        for i in range(len(new_sizes)):
+            if new_sizes[i] > largest_species_count:
+                largest_species_index = i
+                largest_species_count = new_sizes[i]
+
+        new_sizes[largest_species_index] += (population_size - sum(new_sizes))
+
+    return new_sizes
