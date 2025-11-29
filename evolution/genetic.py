@@ -132,6 +132,18 @@ def _mutate_node(connection: tuple[int, int], individual: NeuralNetwork) -> bool
     return mutated
 
 def create_species(population: list[NeuralNetwork], coefficients: tuple[float, float, float], compatibility_distance: float) -> list[list[NeuralNetwork]]:
+    """
+    Divide a population of neural networks into species based on their genetic similarity.
+
+    Args:
+        population (list[NeuralNetwork]): List of neural networks to speciate.
+        coefficients (tuple[float, float, float]): Weights for (excess, disjoint, weight differences) in compatibility calculation.
+        compatibility_distance (float): Threshold for determining whether two networks belong to the same species.
+
+    Returns:
+        list[list[NeuralNetwork]]: A list of species, each of which is a list of neural networks.
+    """
+
     if len(coefficients) != 3:
         raise ValueError("There should be exactly 3 coefficients.")
 
@@ -155,6 +167,19 @@ def create_species(population: list[NeuralNetwork], coefficients: tuple[float, f
 
 
 def _individuals_within_compatibility_distance(network1: NeuralNetwork, network2: NeuralNetwork, coefficients: tuple[float, float, float], compatibility_distance: float) -> bool:
+    """
+    Determine whether two neural networks are within a specified compatibility distance.
+
+    Args:
+        network1 (NeuralNetwork): The first neural network.
+        network2 (NeuralNetwork): The second neural network.
+        coefficients (tuple[float, float, float]): Weights for (excess, disjoint, weight differences) in the distance calculation.
+        compatibility_distance (float): Threshold distance below which networks are considered compatible (same species).
+
+    Returns:
+        bool: True if the networks are compatible (distance < compatibility_distance), False otherwise.
+    """
+
     if len(coefficients) != 3:
         raise ValueError("There should be exactly 3 coefficients.")
 
