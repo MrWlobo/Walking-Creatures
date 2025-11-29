@@ -14,7 +14,7 @@
   <joint name="hip_left" type="revolute">
     <origin xyz="0 0.1 0" rpy="0 0 0"/>
     <parent link="torso"/><child link="left_leg"/>
-    <axis xyz="1 0 0"/><limit lower="-0.785" upper="0.785" effort="12" velocity="6"/>
+    <axis xyz="1 0 0"/><limit effort="10000" velocity="100"/>
   </joint>
 
   <link name="right_leg">
@@ -25,7 +25,7 @@
   <joint name="hip_right" type="revolute">
     <origin xyz="0 -0.1 0" rpy="0 0 0"/>
     <parent link="torso"/><child link="right_leg"/>
-    <axis xyz="1 0 0"/><limit lower="-0.785" upper="0.785" effort="12" velocity="6"/>
+    <axis xyz="1 0 0"/><limit effort="10000" velocity="100"/>
   </joint>
 
   <link name="left_arm">
@@ -36,7 +36,7 @@
   <joint name="shoulder_left" type="spherical">
     <origin xyz="0.1 0.25 0.1" rpy="0 0 0"/>
     <parent link="torso"/><child link="left_arm"/>
-    <limit lower="-1.57 -1.57 -1.57" upper="1.57 1.57 1.57" effort="10" velocity="5"/>
+    <limit effort="10000" velocity="100"/>
   </joint>
 
   <link name="right_arm">
@@ -47,6 +47,6 @@
   <joint name="shoulder_right" type="spherical">
     <origin xyz="0.1 -0.25 0.1" rpy="0 0 0"/>
     <parent link="torso"/><child link="right_arm"/>
-    <limit lower="-1.57 -1.57 -1.57" upper="1.57 1.57 1.57" effort="10" velocity="5"/>
+    <limit effort="10000" velocity="100"/>
   </joint>
 </robot>

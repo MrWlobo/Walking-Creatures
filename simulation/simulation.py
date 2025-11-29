@@ -39,6 +39,9 @@ class Simulation:
         p.setGravity(0, 0, 0, physicsClientId=self.client_id)
 
         self.planeId = p.loadURDF("plane.urdf", physicsClientId=self.client_id)
+
+        # set ground friction
+        p.changeDynamics(self.planeId, -1, lateralFriction=0.4, physicsClientId=self.client_id)
         
         # load creature at origin (temp)
         start_orientation = p.getQuaternionFromEuler([0, 0, 0], physicsClientId=self.client_id)
@@ -64,6 +67,11 @@ class Simulation:
 
         self.num_revolute = len(self.revolute_joints)
         self.num_spherical = len(self.spherical_joints)
+
+        # add rolling and spinning friction
+        p.changeDynamics(self.creatureId, -1, rollingFriction=0.1, spinningFriction=0.1)
+        for i in range(p.getNumJoints(self.creatureId)):
+            p.changeDynamics(self.creatureId, i, rollingFriction=0.1, spinningFriction=0.1)
         
         # disable default motors for revolute joints
         if self.num_revolute > 0:
@@ -79,8 +87,9 @@ class Simulation:
             p.setJointMotorControlMultiDof(
                 self.creatureId, 
                 j_id,
-                p.TORQUE_CONTROL, 
-                force=np.zeros((3)),
+                p.POSITION_CONTROL,
+                targetPosition=[0, 0, 0, 1],
+                force=[0, 0, 0],
                 physicsClientId=self.client_id
             )
 
@@ -109,6 +118,8 @@ class Simulation:
         # find the creature's stable pose.
         for _ in range(settle_steps):
             p.stepSimulation(physicsClientId=self.client_id)
+
+        assert not self._is_clipping(), f"Creature settled inside the ground. Lowest point: {self._get_lowest_point()}."
 
         # save the stable starting state to use after resets
         self.startStateId = p.saveState(physicsClientId=self.client_id)
@@ -265,8 +276,73 @@ class Simulation:
         p.restoreState(self.startStateId, physicsClientId=self.client_id)
         self.tick_count = 0
 
+        self._apply_jitter(0.1)
+
 
     def terminate(self):
         """Disconnects from the PyBullet physics server.
         Call this after finishing all necessary simulations using this object."""
         p.disconnect(physicsClientId=self.client_id)
+    
+
+    def _get_lowest_point(self) -> float:
+        """
+        Returns the absolute lowest Z-coordinate of the creature.
+        """
+        min_z = p.getAABB(self.creatureId, -1, physicsClientId=self.client_id)[0][2]
+        
+        num_joints = p.getNumJoints(self.creatureId, physicsClientId=self.client_id)
+        for i in range(num_joints):
+            aabb = p.getAABB(self.creatureId, i, physicsClientId=self.client_id)
+            min_z = min(min_z, aabb[0][2])
+            
+        return min_z
+
+
+    def _is_clipping(self, threshold: float = -0.005) -> bool:
+        """
+        Returns True if the creature is significantly inside the floor.
+
+        :param float threshold: The z-level below which we consider 'clipping'. 
+                        -0.02 means 2cm underground.
+        """
+        lowest_z = self._get_lowest_point()
+        
+        if lowest_z < threshold:
+            return True
+        return False
+    
+
+    def _apply_jitter(self, intensity: float = 0.1):
+        """
+        Applies a small random perturbation to all joint positions to break 
+        symmetry and zero-state equilibrium.
+        
+        :param float intensity: The magnitude of the jitter in radians.
+        """
+        if self.num_revolute > 0:
+            revolute_jitter = np.random.uniform(-intensity, intensity, size=self.num_revolute)
+            
+            for i, j_id in enumerate(self.revolute_joints):
+                p.resetJointState(
+                    self.creatureId, 
+                    j_id, 
+                    targetValue=revolute_jitter[i], 
+                    targetVelocity=0,
+                    physicsClientId=self.client_id
+                )
+
+        for j_id in self.spherical_joints:
+            roll = np.random.uniform(-intensity, intensity)
+            pitch = np.random.uniform(-intensity, intensity)
+            yaw = np.random.uniform(-intensity, intensity)
+            
+            start_quat = p.getQuaternionFromEuler([roll, pitch, yaw])
+            
+            p.resetJointStateMultiDof(
+                self.creatureId, 
+                j_id, 
+                targetValue=start_quat, 
+                targetVelocity=[0, 0, 0],
+                physicsClientId=self.client_id
+            )

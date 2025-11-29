@@ -49,6 +49,6 @@
   <joint name="spine_joint" type="spherical">
     <origin xyz="0 0 0.35" rpy="0 0 0"/> <parent link="base_link"/>
     <child link="upper_body"/>
-    <!-- <limit lower="-1.57 -1.57 -1.57" upper="1.57 1.57 1.57" effort="20" velocity="10"/> -->
+    <limit effort="10000" velocity="100"/>
   </joint>
 </robot>
