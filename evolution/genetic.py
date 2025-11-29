@@ -130,3 +130,49 @@ def _mutate_node(connection: tuple[int, int], individual: NeuralNetwork) -> bool
         mutated = individual.add_node_to_connection(connection)
 
     return mutated
+
+def create_species(population: list[NeuralNetwork], coefficients: tuple[float, float, float], compatibility_distance: float) -> list[list[NeuralNetwork]]:
+    if len(coefficients) != 3:
+        raise ValueError("There should be exactly 3 coefficients.")
+
+    if not population:
+        raise ValueError("Population cannot be empty.")
+
+    speciated_population = [[population[0]]]
+
+    for individual in population[1:]:
+        added_to_species = False
+        for species in speciated_population:
+            if _individuals_within_compatibility_distance(individual, random.choice(species), coefficients, compatibility_distance):
+                species.append(individual)
+                added_to_species = True
+                break
+
+        if not added_to_species:
+            speciated_population.append([individual])
+
+    return speciated_population
+
+
+def _individuals_within_compatibility_distance(network1: NeuralNetwork, network2: NeuralNetwork, coefficients: tuple[float, float, float], compatibility_distance: float) -> bool:
+    if len(coefficients) != 3:
+        raise ValueError("There should be exactly 3 coefficients.")
+
+    c1, c2, c3 = coefficients
+
+    excess_count = 0
+    disjoint_count = 0
+    weight_differences = []
+    normalization_value = max(len(network1.connections), len(network2.connections), 1)
+
+    for connection in network1.connections:
+        if connection not in network2.connections and (connection[0] not in network2.nodes or connection[1] not in network2.nodes):
+            excess_count += 1
+        elif connection not in network2.connections:
+            disjoint_count += 1
+        else:
+            weight_differences.append(abs(network1.connections[connection]["weight"] - network2.connections[connection]["weight"]))
+
+    average_weight_differences = sum(weight_differences) / len(weight_differences) if weight_differences else 0
+
+    return (c1 * excess_count) / normalization_value + (c2 * disjoint_count) / normalization_value + c3 * average_weight_differences < compatibility_distance

@@ -9,7 +9,7 @@ from simulation.simulation import Simulation
 from evolution.neural_network import NeuralNetwork
 from evolution.fitness import XDistanceFitness
 from core.types import GeneticAlgorithmParams, FullJointStateGetter, TimeOnlyRunConditions
-from core.orchestrate import run_population
+from core.orchestrate import run_population, _run_individual
 from evolution.population import generate_random_individual
 from evolution.genome_visualization import visualize_network
 
@@ -18,26 +18,38 @@ from evolution.genome_visualization import visualize_network
 #
 
 if __name__ == "__main__":
-    start_time = time.perf_counter()
-
-    pop = [generate_random_individual(16, 2, 2) for _ in range(1000)]
-
+    # start_time = time.perf_counter()
+    #
+    # pop = [generate_random_individual(16, 2, 2) for _ in range(1000)]
+    #
+    # params = GeneticAlgorithmParams()
+    # params.creature_path = Path("assets/creatures/2-spherical_2-revolute_two-arm-biped.urdf")
+    # params.fitness = XDistanceFitness()
+    # params.indiv_output_scale = 1000
+    # params.n_processes = None
+    # params.state_getter = FullJointStateGetter()
+    # params.run_conditions = TimeOnlyRunConditions(10)
+    # results = run_population(pop, params)
+    #
+    #
+    # for r in results:
+    #     print(r)
+    #
+    # print(len(results))
+    #
+    # end_time = time.perf_counter()
+    #
+    # execution_time = end_time - start_time
+    # print(f"The code executed in {execution_time:.6f} seconds")
     params = GeneticAlgorithmParams()
-    params.creature_path = Path("assets/creatures/2-spherical_2-revolute_two-arm-biped.urdf")
+    params.creature_path = Path("assets/creatures/6-revolute_biped.urdf")
     params.fitness = XDistanceFitness()
-    params.indiv_output_scale = 1000
+    params.indiv_output_scale = 100
     params.n_processes = None
     params.state_getter = FullJointStateGetter()
-    params.run_conditions = TimeOnlyRunConditions(10)
-    results = run_population(pop, params)
+    params.run_conditions = TimeOnlyRunConditions(100)
 
+    sim = Simulation(p.GUI, Path("assets/creatures/6-revolute_biped.urdf"))
 
-    for r in results:
-        print(r)
-    
-    print(len(results))
-
-    end_time = time.perf_counter()
-
-    execution_time = end_time - start_time
-    print(f"The code executed in {execution_time:.6f} seconds")
+    indiv = generate_random_individual(12, 6, 0)
+    _run_individual(indiv, sim, params)
