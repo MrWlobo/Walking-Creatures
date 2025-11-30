@@ -10,8 +10,7 @@ from evolution.fitness import Fitness
 from evolution.selection import Selection
 
 class GeneticAlgorithmParams:
-    """Customizable parameters for the genetic algorithm. They should be consistent across the whole GA,
-        as they are passed between many functions.
+    """Customizable parameters for the genetic algorithm. They should be consistent across the whole GA, as they are passed between many functions.
 
     Attributes:
         creature_path (Path): Absolute path to .urdf creature model to use in the algorithm.
@@ -20,8 +19,12 @@ class GeneticAlgorithmParams:
         state_getter (CreatureStateGetter): An object defining what data to extract from the simulation every tick 
                                             and to feed to the individual's neural network.
         run_conditions (RunConditions): Defines the conditions for the simulation to end (e.g. time limit).
+        population_size (int): Number of individuals in each generation.
         indiv_output_scale (float): Value to multiply NN outputs by before passing them to joint control functions.
                                     Used to match the appropriate order of magnitude of forces for the particular creature.
+        speciation_coefficients (tuple[float, float, float]): Weights for (excess, disjoint, weight differences)
+                                                                in compatibility calculation for speciation purposes.
+        speciation_compatibility_distance (float): Threshold for determining whether two networks belong to the same species.
         n_processes (int): How many threads to use when running the population's simulations. 
                             Use None to let the functions use the maximum available number of threads.
         time_step (float): How much time should one tick of the simulation represent. Probably not necessary to change.
@@ -33,7 +36,10 @@ class GeneticAlgorithmParams:
     selection: Selection
     state_getter: CreatureStateGetter
     run_conditions: RunConditions
+    population_size: int
     indiv_output_scale: float
+    speciation_coefficients: tuple[float, float, float]
+    speciation_compatibility_distance: float
     n_processes: int = None
     time_step: float = 1./240.
     settle_steps: int = 120
