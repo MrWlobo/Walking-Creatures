@@ -1,17 +1,23 @@
+import random
 from pathlib import Path
 import networkx as nx
 import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
 from matplotlib.axis import Axis
+from numpy.ma.core import shape
 
 from evolution.neural_network import NeuralNetwork
 
+
 class Visualization:
+
+    species_colors = {}
+    species_markers = {}
+    marker_shapes = ['o', 's', '^', 'D', 'v', '<', '>', '*', 'P', 'X']
 
     def __init__(self, save_folder: str):
         self.save_folder = save_folder
 
-    def visualize_network(self, network: NeuralNetwork, axis: Axis, filename: str, save_image: bool = False, show_image: bool = True) -> None:
+    def visualize_network(self, network: NeuralNetwork, axis: Axis, filename: str, title: str = None, save_image: bool = False, show_image: bool = True) -> None:
         """
         Visualize a NEAT-style neural network using NetworkX and Matplotlib.
 
@@ -43,18 +49,28 @@ class Visualization:
             The base filename used when saving the visualization image.
             The file will be saved to `visualizations/<filename>.png`.
 
+        title : str, optional (default=None)
+            Title for the plot. If None, a default title showing the number of individuals
+            and species will be used.
+
         save_image : bool, optional (default=False)
             If True, the image is saved using `plt.savefig()`.
 
         show_image : bool, optional (default=True)
             If True, displays the visualization in a Matplotlib window.
 
-       Returns
+        Returns
         -------
         None
+            The function only draws the plot, optionally saves or shows it, and does not return anything.
         """
 
         axis.clear()
+
+        if title is None:
+            axis.set_title(f"Individual with a fitness value of {network.fitness_value}")
+        else:
+            axis.set_title(title)
 
         G = nx.DiGraph()
 
@@ -115,3 +131,73 @@ class Visualization:
         if show_image:
             plt.show()
 
+    def visualize_population(self, population: list[list[NeuralNetwork]], axis: Axis, filename: str, title: str = None, save_image: bool = False, show_image: bool = True) -> None:
+        """
+        Visualize a population of NEAT networks as a scatter plot, coloring and shaping points by species.
+
+        Each species is assigned a unique color and marker shape. Individuals are plotted at
+        random positions within a fixed range for visual separation.
+
+        X and Y axis ticks are removed for clarity. The plot can optionally be saved or displayed.
+
+        Parameters
+        ----------
+        population : list of list of NeuralNetwork
+            The population of neural networks, divided into species.
+            Each sublist represents a species containing its individuals.
+
+        axis : matplotlib.axes.Axes
+            The axes on which to draw the scatter plot.
+
+        filename : str
+            Base filename used when saving the image. The file will be saved under
+            `self.save_folder/populations/<filename>.png`.
+
+        title : str, optional (default=None)
+            Title for the plot. If None, a default title showing the number of individuals
+            and species will be used.
+
+        save_image : bool, optional (default=False)
+            If True, the plot will be saved to the `self.save_folder`.
+
+        show_image : bool, optional (default=True)
+            If True, the plot will be displayed using Matplotlib.
+
+        Returns
+        -------
+        None
+            The function only draws the plot, optionally saves or shows it, and does not return anything.
+        """
+
+        min_pos, max_pos = 1, 100
+        color_value_reduce = 0.2
+
+        axis.set_xticks([])
+        axis.set_yticks([])
+
+        if title is None:
+            axis.set_title(f"Population of {sum([len(species) for species in population])} individuals divided into {len(population)} species")
+        else:
+            axis.set_title(title)
+
+        for i, species in enumerate(population):
+
+            if i in Visualization.species_colors:
+                color = Visualization.species_colors[i]
+                marker = Visualization.species_markers[i]
+            else:
+                color = (abs(random.random() - color_value_reduce), abs(random.random() - color_value_reduce), abs(random.random() - color_value_reduce))
+                marker = random.choice(Visualization.marker_shapes)
+                Visualization.species_colors[i] = color
+                Visualization.species_markers[i] = marker
+
+            for individual in species:
+                axis.scatter(random.uniform(min_pos, max_pos), random.uniform(min_pos, max_pos), color=color, marker=marker)
+
+        file = Path(self.save_folder, "populations", f"{filename}.png")
+        if save_image:
+            file.parent.mkdir(parents=True, exist_ok=True)
+            plt.savefig(file, bbox_inches="tight", dpi=150)
+
+        if show_image:
+            plt.show()
