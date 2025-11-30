@@ -3,7 +3,6 @@ from pathlib import Path
 import networkx as nx
 import matplotlib.pyplot as plt
 from matplotlib.axis import Axis
-from numpy.ma.core import shape
 
 from evolution.neural_network import NeuralNetwork
 
@@ -12,7 +11,7 @@ class Visualization:
 
     species_colors = {}
     species_markers = {}
-    marker_shapes = ['o', 's', '^', 'D', 'v', '<', '>', '*', 'P', 'X']
+    marker_shapes = ["o", "s", "^", "D", "v", "<", ">", "*", "P", "X"]
 
     def __init__(self, save_folder: str):
         self.save_folder = save_folder
@@ -195,6 +194,66 @@ class Visualization:
                 axis.scatter(random.uniform(min_pos, max_pos), random.uniform(min_pos, max_pos), color=color, marker=marker)
 
         file = Path(self.save_folder, "populations", f"{filename}.png")
+        if save_image:
+            file.parent.mkdir(parents=True, exist_ok=True)
+            plt.savefig(file, bbox_inches="tight", dpi=150)
+
+        if show_image:
+            plt.show()
+
+    def visualize_population_with_fittest_individual(self, population: list[list[NeuralNetwork]], current_generation: int, filename: str, save_image: bool = False, show_image: bool = True) -> None:
+        """
+        Visualize a population of NEAT networks alongside the fittest individual.
+
+        The function creates a side-by-side plot with two subplots:
+        1. A scatter plot of the population, with different colors and markers for species.
+        2. A detailed network visualization of the fittest individual in the population.
+
+        Parameters
+        ----------
+        population : list of list of NeuralNetwork
+            The population divided into species. Each sublist contains individuals of one species.
+
+        current_generation : int
+            The current generation number, used for the plot title.
+
+        filename : str
+            Base filename for saving the figure. The plot will be saved under
+            `self.save_folder/populations_with_best_individual/<filename>.png`.
+
+        save_image : bool, optional (default=False)
+            If True, saves the plot to the specified folder.
+
+        show_image : bool, optional (default=True)
+            If True, displays the plot with Matplotlib.
+
+        Raises
+        ------
+        ValueError
+            If the population contains no individuals.
+
+        Returns
+        -------
+        None
+            The function produces a visualization and optionally saves or displays it.
+        """
+
+        fittest = None
+        for species in population:
+            for individual in species:
+                if fittest is None:
+                    fittest = individual
+                elif fittest.fitness_value < individual.fitness_value:
+                    fittest = individual
+
+        if fittest is None:
+            raise ValueError("There are no individuals in the given population.")
+
+        figure, axis = plt.subplots(1, 2, figsize=(12, 6))
+        self.visualize_population(population, axis[0], "", f"Generation {current_generation}: Population", False, False)
+        self.visualize_network(fittest, axis[1], "", f"Generation {current_generation}: Best individual with fitness {fittest.fitness_value}", False, False)
+
+        file = Path(self.save_folder, "populations_with_best_individual", f"{filename}.png")
         if save_image:
             file.parent.mkdir(parents=True, exist_ok=True)
             plt.savefig(file, bbox_inches="tight", dpi=150)
