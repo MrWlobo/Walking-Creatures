@@ -1,3 +1,4 @@
+import pickle
 from dataclasses import asdict
 from datetime import datetime
 import json
@@ -46,6 +47,9 @@ class GeneticAlgorithm:
         # save GA params
         with open((self.save_dir / "params.json").resolve(), "w") as f:
             json.dump(asdict(self.params), f, indent=4, default=str)
+        
+        with open((self.save_dir / "params.pkl").resolve(), "wb") as f:
+            pickle.dump(self.params, f)
     
 
     def evolve(self):
@@ -76,6 +80,11 @@ class GeneticAlgorithm:
             # save generation stats
             self._save_generation_stats(generation, curr_species, intiial_fitness_stats, species_fitness_stats)
             
+            logging.basicConfig(
+                level=logging.INFO,
+                format='\033[92m%(levelname)s: %(message)s\033[0m',
+                force=True 
+            )
             logging.info(f"Generation {generation} finished.")
 
 

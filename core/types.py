@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from simulation.simulation import Simulation
     from evolution.fitness import Fitness
     from evolution.selection import Selection
-    
+
 @dataclass
 class GeneticAlgorithmParams:
     """Customizable parameters for the genetic algorithm. They should be consistent across the whole GA, as they are passed between many functions.
@@ -92,6 +92,10 @@ class TimeOnlyRunConditions(RunConditions):
 
     def isRunEnd(self, sim: Simulation) -> bool:
         return sim.tick_count * sim.time_step >= self.max_time_seconds
+    
+    
+    def __repr__(self):
+        return f"{type(self).__name__}(max_time_seconds={self.max_time_seconds})"
 
 
 # creature state getters
@@ -115,6 +119,10 @@ class FullJointStateGetter(CreatureStateGetter):
         s_positions, s_velocities = simulation.get_spherical_joint_states()
 
         return _combine_inputs([r_positions, r_velocities, s_positions, s_velocities])
+    
+    
+    def __repr__(self):
+        return f"{type(self).__name__}()"
 
 
 def _combine_inputs(arrays) -> npt.NDArray:

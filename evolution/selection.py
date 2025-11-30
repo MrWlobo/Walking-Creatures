@@ -45,6 +45,11 @@ class TournamentSelection(Selection):
             raise ValueError("Cannot select from an empty population.")
 
         if self.tournament_size >= len(population):
+            logging.basicConfig(
+                level=logging.WARNING,
+                format='\033[93m%(levelname)s: %(message)s\033[0m',
+                force=True 
+            )
             logging.warning(f"Species with size ({len(population)}) smaller than tournament size ({self.tournament_size}) encountered.")
         current_tournament_size = min(self.tournament_size, len(population))
 
@@ -56,6 +61,10 @@ class TournamentSelection(Selection):
         selected = max(tournament, key=lambda i: i.fitness_value)
 
         return selected
+    
+    
+    def __repr__(self):
+        return f"{type(self).__name__}(tournament_size={self.tournament_size})"
 
 
 class RouletteSelection(Selection):
@@ -82,3 +91,7 @@ class RouletteSelection(Selection):
         selected = random.choices(population, weights=weights, k=1)[0]
 
         return selected
+    
+    
+    def __repr__(self):
+        return f"{type(self).__name__}()"
