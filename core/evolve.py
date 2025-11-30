@@ -1,9 +1,17 @@
+from dataclasses import asdict
+from datetime import datetime
+import json
+import logging
+from pathlib import Path
+from matplotlib import pyplot as plt
 import pybullet as p
 
 from core.types import GeneticAlgorithmParams
-from evolution.fitness import evaluate_population
+from evolution.fitness import FitnessStats, evaluate_population
+from evolution.helpers import serialize_network
 from evolution.neural_network import NeuralNetwork
-from evolution.population import create_species, generate_random_population
+from evolution.population import calculate_new_species_sizes, create_next_generation, create_species, generate_random_population
+from evolution.visualization import Visualization
 from simulation.simulation import Simulation
 
 
@@ -14,8 +22,8 @@ class GeneticAlgorithm:
         # calculate NN input and output dimensions
         temp_sim = Simulation(p.DIRECT, self.params.creature_path)
 
-        self.units_1d: int = temp_sim.num_revolute * 2 # 2 values for each 1d joint
-        self.units_3d: int = temp_sim.num_spherical * 6 # 2 3d vectors for each 3d joint
+        self.units_1d: int = temp_sim.num_revolute # 2 values for each 1d joint
+        self.units_3d: int = temp_sim.num_spherical # 2 3d vectors for each 3d joint
 
         self.input_units: int = len(self.params.state_getter.get_state(temp_sim))
 
@@ -28,6 +36,16 @@ class GeneticAlgorithm:
             self.units_1d, 
             self.units_3d
         )
+        
+        # create dir to store GA run results
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        dir_name = f"run_{timestamp}"
+        self.save_dir: Path = self.params.results_path / dir_name
+        self.save_dir.mkdir(parents=True, exist_ok=True)
+        
+        # save GA params
+        with open((self.save_dir / "params.json").resolve(), "w") as f:
+            json.dump(asdict(self.params), f, indent=4, default=str)
     
 
     def evolve(self):
@@ -37,9 +55,50 @@ class GeneticAlgorithm:
             # calculate fitness stats for the whole population before speciation
             intiial_fitness_stats = self.params.fitness.getStats(self.population)
 
+            # divide the population into species
             self.population = create_species(self.population, self.params.speciation_coefficients, self.params.speciation_compatibility_distance)
+            
+            # save the speciated populaton for visualisation purposes
+            curr_species = self.population
+            
+            # adjust each species' fitness values
+            self.population = self.params.fitness.adjustSpeciesFitness(self.population)
+            
+            # get fitness stats for each species
+            species_fitness_stats = [self.params.fitness.getStats(species) for species in self.population]
+            
+            # calculate new species sizes for the purpose of genetic operations
+            new_species_sizes = calculate_new_species_sizes(self.population)
+            
+            # generate a new population using genetic operations
+            self.population = create_next_generation(self.population, new_species_sizes, self.params)
+            
+            # save generation stats
+            self._save_generation_stats(generation, curr_species, intiial_fitness_stats, species_fitness_stats)
+            
+            logging.info(f"Generation {generation} finished.")
 
 
-    def _save_generation_stats(self):
-        pass
-
+    def _save_generation_stats(self, generation: int, curr_species: list[list[NeuralNetwork]], intiial_fitness_stats: FitnessStats, species_fitness_stats: list[FitnessStats]):
+        GEN_DIR = self.save_dir / f"generation-{generation}"
+        GEN_DIR.mkdir(parents=True, exist_ok=True)
+        
+        # save pre-speciation fitness
+        with open((GEN_DIR / "pre-speciation_fitness.json").resolve(), "w") as f:
+            json.dump(asdict(intiial_fitness_stats), f, indent=4)
+        
+        # save fitness for each species
+        with open((GEN_DIR / "species_fitness.json").resolve(), "w") as f:
+            json.dump([asdict(species_fitness) for species_fitness in species_fitness_stats], f, indent=4, default=str)
+        
+        viz = Visualization(GEN_DIR)
+        fig, ax = plt.subplots(1, 1)
+        
+        # save population plots
+        viz.visualize_population(curr_species, ax, "population_img", save_image=True, show_image=False)
+        viz.visualize_population_with_fittest_individual(curr_species, generation, "populatio_with_fittes_indiv_img", save_image=True, show_image=False)
+        
+        # save fittest individual and its visualisation
+        best_indiv = max([max(species, key=lambda i: i.fitness_value) for species in curr_species], key=lambda i: i.fitness_value)
+        serialize_network(best_indiv, GEN_DIR, "best_individual")
+        viz.visualize_network(best_indiv, ax, "best_individual_img", save_image=True, show_image=False)

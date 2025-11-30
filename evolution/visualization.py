@@ -168,7 +168,7 @@ class Visualization:
             The function only draws the plot, optionally saves or shows it, and does not return anything.
         """
 
-        min_pos, max_pos = 1, 100
+        min_pos, max_pos = 1, 1000
         color_value_reduce = 0.2
 
         axis.set_xticks([])

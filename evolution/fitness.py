@@ -5,12 +5,12 @@ import abc
 import numpy as np
 
 from core.orchestrate import run_population
-from core.types import GeneticAlgorithmParams
 from evolution.exceptions import NoneFitnessException
 from evolution.neural_network import NeuralNetwork
 
 if TYPE_CHECKING:
     from core.types import RunResult
+    from core.types import GeneticAlgorithmParams
 
 
 class Fitness(abc.ABC):
@@ -22,6 +22,10 @@ class Fitness(abc.ABC):
     def calculate(self, run_result: RunResult) -> float:
         """
         Calculates the fitness from a RunResult object.
+        
+        Important: fitness functions should be designed in such a way,
+        that higher values are assigned to better individuals and
+        lower values are assigned to worse individuals.
         
         :param RunResult run_result: A dataclass containing run data.
         :return float: A single float value representing the fitness.
@@ -68,7 +72,6 @@ class XDistanceFitness(Fitness):
             for indiv in s:
                 indiv.fitness_value /= curr_size
         
-
         return species
     
 

@@ -1,5 +1,8 @@
+import copy
 import random
 
+from core.types import GeneticAlgorithmParams
+from evolution.genetic import crossover, mutate
 from evolution.neural_network import NeuralNetwork
 
 
@@ -34,6 +37,52 @@ def generate_random_individual(input_units: int, units_1d: int, units_3d: int) -
     """
     network = NeuralNetwork(input_units, units_1d, units_3d)
     return network
+
+
+def create_next_generation(population: list[list[NeuralNetwork]], new_species_sizes: list[int], params: GeneticAlgorithmParams) -> list[NeuralNetwork]:
+    """Creates a new (not speciated) population from an old (speciated) population.
+
+    Args:
+        population (list[list[NeuralNetwork]]): The speciated population the generate the new population from.
+        new_species_sizes (list[int]): The respective desired sizes of each species in the population. 
+        params (GeneticAlgorithmParams): Parameters of the GA.
+
+    Returns:
+        list[NeuralNetwork]: The new population, without defined species.
+    """
+    if len(population) != len(new_species_sizes):
+        raise ValueError(f"Number of species doesn't match number of new species sizes list, population: {population}, species sizes: {new_species_sizes}")
+    
+    crossover_thresh = params.genetic_operation_ratios[0]
+    mutation_thresh = crossover_thresh + params.genetic_operation_ratios[1]
+    
+    new_population = []
+    
+    for species, new_size in zip(population, new_species_sizes):
+        for _ in range(new_size):
+            r = random.random()
+            
+            offspring = None
+            
+            if r < crossover_thresh:
+                indiv1, indiv2 = params.selection.select(species), params.selection.select(species)
+                offspring = crossover(indiv1, indiv2)
+            elif r < mutation_thresh:
+                indiv = params.selection.select(species)
+                offspring = mutate(params.mutation_type_percentages, copy.deepcopy(indiv))
+            else:
+                indiv = params.selection.select(species)
+                offspring = copy.deepcopy(indiv)
+            
+            if not isinstance(offspring, NeuralNetwork):
+                raise RuntimeError(f"Offspring of type {type(offspring)} was generated instead of NeuralNetwork.")
+            
+            new_population.append(offspring)
+    
+    if sum([len(species) for species in population]) != len(new_population):
+        raise RuntimeError(f"New population size={len(new_population)} is not equal to the old population size={sum([len(species) for species in population])}")
+    
+    return new_population
 
 
 def create_species(population: list[NeuralNetwork], coefficients: tuple[float, float, float], compatibility_distance: float) -> list[list[NeuralNetwork]]:
@@ -139,7 +188,7 @@ def calculate_new_species_sizes(species: list[list[NeuralNetwork]]) -> list[int]
     new_sizes = []
 
     for values in adjusted_fitness_values:
-        new_size = int(sum(values) / mean_adjusted_fitness * population_size)
+        new_size = int(sum(values) / mean_adjusted_fitness)
         new_sizes.append(new_size)
 
     if sum(new_sizes) < population_size:

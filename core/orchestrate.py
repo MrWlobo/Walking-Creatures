@@ -37,7 +37,7 @@ def run_population(population: list[NeuralNetwork], params: GeneticAlgorithmPara
     return run_results
 
 
-def _run_individual(indiv: NeuralNetwork, sim: Simulation, params: GeneticAlgorithmParams) -> RunResult:
+def run_individual(indiv: NeuralNetwork, sim: Simulation, params: GeneticAlgorithmParams) -> RunResult:
     """Runs a creature walking simulation based on an individual and returns relevant run data.
     The function is designed to work on a perviously initialized Simulation object, for efficiency.
 
@@ -104,4 +104,4 @@ def _cleanup_process():
 
 
 def _run_process(indiv: NeuralNetwork, params: GeneticAlgorithmParams):
-    return _run_individual(indiv, _worker_sim, params)
+    return run_individual(indiv, _worker_sim, params)

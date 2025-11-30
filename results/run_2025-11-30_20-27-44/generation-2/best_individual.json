@@ -1,0 +1,23 @@
+{
+  "nodes": {
+    "0": "input",
+    "1": "input",
+    "2": "input",
+    "3": "input",
+    "4": "input",
+    "5": "input",
+    "6": "output",
+    "7": "output",
+    "8": "output"
+  },
+  "connections": {
+    "0,7": {
+      "weight": 0.7863106963489124,
+      "enabled": true
+    },
+    "4,6": {
+      "weight": 0.9889023556550005,
+      "enabled": true
+    }
+  }
+}

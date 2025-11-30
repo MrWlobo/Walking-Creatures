@@ -14,8 +14,6 @@ def crossover(parent1: NeuralNetwork, parent2: NeuralNetwork) -> NeuralNetwork:
     Args:
         parent1 (NeuralNetwork): First parent network.
         parent2 (NeuralNetwork): Second parent network.
-        p1_fitness (float): Fitness score of parent1.
-        p2_fitness (float): Fitness score of parent2.
 
     Returns:
         NeuralNetwork: Child network created from the crossover of the two parents.
@@ -38,6 +36,7 @@ def crossover(parent1: NeuralNetwork, parent2: NeuralNetwork) -> NeuralNetwork:
     child = NeuralNetwork(nodes=new_nodes, connections=new_connections)
     return child
 
+
 def mutate(probabilities: list[int], individual: NeuralNetwork) -> None:
     """
     Perform a mutation on an individual neural network based on given probabilities.
@@ -49,6 +48,8 @@ def mutate(probabilities: list[int], individual: NeuralNetwork) -> None:
         individual (NeuralNetwork): The neural network to mutate.
     """
 
+    indiv_copy = copy.deepcopy(individual)
+
     if len(probabilities) != 3:
         raise ValueError("There should be exactly 3 values in probabilities.")
 
@@ -58,24 +59,27 @@ def mutate(probabilities: list[int], individual: NeuralNetwork) -> None:
     selected = random.uniform(1, 100)
 
     if selected <= probabilities[0]:
-        connection = random.choice(list(individual.connections.keys()))
-        _mutate_weight(connection, individual)
+        connection = random.choice(list(indiv_copy.connections.keys()))
+        _mutate_weight(connection, indiv_copy)
 
     elif selected <= (probabilities[0] + probabilities[1]):
         success = False
         while not success:
-            node_pairs = [(a, b) for a in individual.nodes for b in individual.nodes
+            node_pairs = [(a, b) for a in indiv_copy.nodes for b in indiv_copy.nodes
                         if a != b]
             if not node_pairs:
                 break
             connection = random.choice(node_pairs)
-            success = _mutate_connection(connection, individual)
+            success = _mutate_connection(connection, indiv_copy)
 
     else:
         success = False
         while not success:
             connection = random.choice(list(individual.connections.keys()))
             success = _mutate_node(connection, individual)
+    
+    return indiv_copy
+
 
 def _mutate_weight(connection: tuple[int, int], individual: NeuralNetwork) -> None:
     """
@@ -93,6 +97,7 @@ def _mutate_weight(connection: tuple[int, int], individual: NeuralNetwork) -> No
         individual.connections[connection]["weight"] += random.uniform(-0.1, 0.1)
     else:
         individual.connections[connection]["weight"] = random.uniform(-1.0, 1.0)
+
 
 def _mutate_connection(connection: tuple[int, int], individual: NeuralNetwork) -> bool:
     """
@@ -113,6 +118,7 @@ def _mutate_connection(connection: tuple[int, int], individual: NeuralNetwork) -
         individual.toggle_connection(connection)
 
     return mutated
+
 
 def _mutate_node(connection: tuple[int, int], individual: NeuralNetwork) -> bool:
     """

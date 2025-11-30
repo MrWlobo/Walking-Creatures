@@ -1,19 +1,23 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING
 from dataclasses import dataclass
-import numpy.typing as npt
 import numpy as np
 import abc
 from pathlib import Path
 
-from simulation.simulation import Simulation
-from evolution.fitness import Fitness
-from evolution.selection import Selection
-
+if TYPE_CHECKING:
+    import numpy.typing as npt
+    from simulation.simulation import Simulation
+    from evolution.fitness import Fitness
+    from evolution.selection import Selection
+    
+@dataclass
 class GeneticAlgorithmParams:
     """Customizable parameters for the genetic algorithm. They should be consistent across the whole GA, as they are passed between many functions.
 
     Attributes:
         creature_path (Path): Absolute path to .urdf creature model to use in the algorithm.
+        results_path (Path): Absolute path to a directory in which a new folder containing the GA run's results will be created.
         fitness (Fitness): The fitness function to base the GA on.
         selection (Selection): The method of selecting best individuals from a population to use.     
         state_getter (CreatureStateGetter): An object defining what data to extract from the simulation every tick 
@@ -21,6 +25,10 @@ class GeneticAlgorithmParams:
         run_conditions (RunConditions): Defines the conditions for the simulation to end (e.g. time limit).
         population_size (int): Number of individuals in each generation.
         n_generations (int): Number of generations to rune the genetic algorithm for.
+        genetic_operation_ratios (tuple[float, float, float]): Probabilities of applying crossover, mutation and succesion 
+                                                                operations, respectively.
+        mutation_type_percentages (list[float]): List of 3 integers representing percent chance for 
+                                                    [0] mutate weight, [1] mutate connection, [2] mutate node. Must sum to 100.
         indiv_output_scale (float): Value to multiply NN outputs by before passing them to joint control functions.
                                     Used to match the appropriate order of magnitude of forces for the particular creature.
         speciation_coefficients (tuple[float, float, float]): Weights for (excess, disjoint, weight differences)
@@ -33,12 +41,15 @@ class GeneticAlgorithmParams:
                             Most likely not necessary to ever change.
     """
     creature_path: Path
+    results_path: Path
     fitness: Fitness
     selection: Selection
     state_getter: CreatureStateGetter
     run_conditions: RunConditions
     population_size: int
     n_generations: int
+    genetic_operation_ratios: tuple[float, float, float]
+    mutation_type_percentages: list[float]
     indiv_output_scale: float
     speciation_coefficients: tuple[float, float, float]
     speciation_compatibility_distance: float

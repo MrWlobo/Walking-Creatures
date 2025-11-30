@@ -1,0 +1,30 @@
+{
+    "creature_path": "D:\\Users\\Kacper\\Desktop\\GP\\assets\\creatures\\1-spherical_hopper.urdf",
+    "results_path": "D:\\Users\\Kacper\\Desktop\\GP\\results",
+    "fitness": "<evolution.fitness.XDistanceFitness object at 0x00000245F87FA870>",
+    "selection": "<evolution.selection.TournamentSelection object at 0x00000245F87FA990>",
+    "state_getter": "<core.types.FullJointStateGetter object at 0x00000245F87FAA50>",
+    "run_conditions": "<core.types.TimeOnlyRunConditions object at 0x00000245F87FAAB0>",
+    "population_size": 1000,
+    "n_generations": 10,
+    "genetic_operation_ratios": [
+        0.9,
+        0.05,
+        0.05
+    ],
+    "mutation_type_percentages": [
+        75,
+        20,
+        5
+    ],
+    "indiv_output_scale": 5,
+    "speciation_coefficients": [
+        1.2,
+        1.4,
+        0.6
+    ],
+    "speciation_compatibility_distance": 1.5,
+    "n_processes": null,
+    "time_step": 0.004166666666666667,
+    "settle_steps": 120
+}

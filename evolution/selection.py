@@ -1,3 +1,4 @@
+import logging
 import random
 import abc
 
@@ -40,10 +41,14 @@ class TournamentSelection(Selection):
         Returns:
             NeuralNetwork: The selected network based on fitness.
         """
-        if self.tournament_size > len(population):
-            raise ValueError("Tournament can't be larger than the entire population.")
+        if not population:
+            raise ValueError("Cannot select from an empty population.")
 
-        tournament = random.sample(population, self.tournament_size)
+        if self.tournament_size >= len(population):
+            logging.warning(f"Species with size ({len(population)}) smaller than tournament size ({self.tournament_size}) encountered.")
+        current_tournament_size = min(self.tournament_size, len(population))
+
+        tournament = random.sample(population, current_tournament_size)
         
         if any([i is None for i in tournament]):
             raise NoneFitnessException(f"Encountered None fitness value, tournament: {tournament}")
