@@ -67,7 +67,7 @@ class Visualization:
         axis.clear()
 
         if title is None:
-            axis.set_title(f"Individual with a fitness value of {network.fitness_value}")
+            axis.set_title(f"Individual with a fitness value of {network.fitness_info}")
         else:
             axis.set_title(title)
 
@@ -243,7 +243,7 @@ class Visualization:
             for individual in species:
                 if fittest is None:
                     fittest = individual
-                elif fittest.fitness_value < individual.fitness_value:
+                elif fittest.fitness_info < individual.fitness_info:
                     fittest = individual
 
         if fittest is None:
@@ -251,7 +251,7 @@ class Visualization:
 
         figure, axis = plt.subplots(1, 2, figsize=(12, 6))
         self.visualize_population(population, axis[0], "", f"Generation {current_generation}: Population", False, False)
-        self.visualize_network(fittest, axis[1], "", f"Generation {current_generation}: Best individual with fitness {fittest.fitness_value}", False, False)
+        self.visualize_network(fittest, axis[1], "", f"Generation {current_generation}: Best individual with fitness {fittest.fitness_info}", False, False)
 
         file = Path(self.save_folder, "populations_with_best_individual", f"{filename}.png")
         if save_image:

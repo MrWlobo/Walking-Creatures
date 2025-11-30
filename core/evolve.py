@@ -57,7 +57,7 @@ class GeneticAlgorithm:
             self.population = evaluate_population(self.population, self.params)
 
             # calculate fitness stats for the whole population before speciation
-            intiial_fitness_stats = self.params.fitness.getStats(self.population)
+            initial_fitness_stats = self.params.fitness.getStats(self.population)
 
             # divide the population into species
             self.population = create_species(self.population, self.params.speciation_coefficients, self.params.speciation_compatibility_distance)
@@ -65,11 +65,11 @@ class GeneticAlgorithm:
             # save the speciated populaton for visualisation purposes
             curr_species = self.population
             
-            # adjust each species' fitness values
-            self.population = self.params.fitness.adjustSpeciesFitness(self.population)
-            
             # get fitness stats for each species
             species_fitness_stats = [self.params.fitness.getStats(species) for species in self.population]
+            
+            # adjust each species' fitness values
+            self.population = self.params.fitness.adjustSpeciesFitness(self.population)
             
             # calculate new species sizes for the purpose of genetic operations
             new_species_sizes = calculate_new_species_sizes(self.population)
@@ -78,7 +78,7 @@ class GeneticAlgorithm:
             self.population = create_next_generation(self.population, new_species_sizes, self.params)
             
             # save generation stats
-            self._save_generation_stats(generation, curr_species, intiial_fitness_stats, species_fitness_stats)
+            self._save_generation_stats(generation, curr_species, initial_fitness_stats, species_fitness_stats)
             
             logging.basicConfig(
                 level=logging.INFO,
@@ -88,13 +88,13 @@ class GeneticAlgorithm:
             logging.info(f"Generation {generation} finished.")
 
 
-    def _save_generation_stats(self, generation: int, curr_species: list[list[NeuralNetwork]], intiial_fitness_stats: FitnessStats, species_fitness_stats: list[FitnessStats]):
+    def _save_generation_stats(self, generation: int, curr_species: list[list[NeuralNetwork]], initial_fitness_stats: FitnessStats, species_fitness_stats: list[FitnessStats]):
         GEN_DIR = self.save_dir / f"generation-{generation}"
         GEN_DIR.mkdir(parents=True, exist_ok=True)
         
         # save pre-speciation fitness
         with open((GEN_DIR / "pre-speciation_fitness.json").resolve(), "w") as f:
-            json.dump(asdict(intiial_fitness_stats), f, indent=4)
+            json.dump(asdict(initial_fitness_stats), f, indent=4)
         
         # save fitness for each species
         with open((GEN_DIR / "species_fitness.json").resolve(), "w") as f:

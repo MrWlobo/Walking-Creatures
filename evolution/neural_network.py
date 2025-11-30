@@ -42,6 +42,7 @@ class NeuralNetwork:
             self.connections = connections
             self.activation_function = activation_function
             self.fitness_value = None
+            self.fitness_info = None
         else:
             self.input_units = input_units
             self.output_units = units_1d + 3 * units_3d
@@ -49,6 +50,7 @@ class NeuralNetwork:
             self.connections = {}
             self.activation_function = activation_function
             self.fitness_value = None
+            self.fitness_info = None
 
             for _ in range(beginning_connections):
                 connection = (random.randint(0, self.input_units - 1), random.randint(self.input_units, self.input_units + self.output_units - 1))

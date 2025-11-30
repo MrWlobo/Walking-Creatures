@@ -79,7 +79,7 @@ class XDistanceFitness(Fitness):
         if any([i is None for i in population]):
             raise NoneFitnessException(f"Encountered None fitness value, population: {population}")
         
-        fitness = np.array([indiv.fitness_value for indiv in population])
+        fitness = np.array([indiv.fitness_info for indiv in population])
 
         return FitnessStats(
             best_fitness=np.max(fitness),
@@ -114,6 +114,7 @@ def evaluate_population(population: list[NeuralNetwork], params: GeneticAlgorith
 
     for indiv, run_result in zip(population, run_results):
         indiv.fitness_value = fitness_function.calculate(run_result)
+        indiv.fitness_info = indiv.fitness_value
     
     # normalize fitness to be greater than 0, as negative fitness values break some stuff
     min_fitness = min(population, key=lambda i: i.fitness_value).fitness_value
