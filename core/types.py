@@ -20,6 +20,7 @@ class GeneticAlgorithmParams:
                                             and to feed to the individual's neural network.
         run_conditions (RunConditions): Defines the conditions for the simulation to end (e.g. time limit).
         population_size (int): Number of individuals in each generation.
+        n_generations (int): Number of generations to rune the genetic algorithm for.
         indiv_output_scale (float): Value to multiply NN outputs by before passing them to joint control functions.
                                     Used to match the appropriate order of magnitude of forces for the particular creature.
         speciation_coefficients (tuple[float, float, float]): Weights for (excess, disjoint, weight differences)
@@ -37,6 +38,7 @@ class GeneticAlgorithmParams:
     state_getter: CreatureStateGetter
     run_conditions: RunConditions
     population_size: int
+    n_generations: int
     indiv_output_scale: float
     speciation_coefficients: tuple[float, float, float]
     speciation_compatibility_distance: float
