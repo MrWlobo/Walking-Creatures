@@ -110,5 +110,10 @@ def evaluate_population(population: list[NeuralNetwork], params: GeneticAlgorith
 
     for indiv, run_result in zip(population, run_results):
         indiv.fitness_value = fitness_function.calculate(run_result)
+    
+    # normalize fitness to be greater than 0, as negative fitness values break some stuff
+    min_fitness = min(population, key=lambda i: i.fitness_value).fitness_value
+    for indiv in population:
+        indiv.fitness_value += min_fitness
 
     return population
