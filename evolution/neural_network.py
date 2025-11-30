@@ -17,15 +17,22 @@ class NeuralNetwork:
     connection_split_table = {} # connection: id of node that splits the connection
 
 
-    def __init__(self, input_units: int = None, units_1d: int = None, units_3d: int = None, activation_function: Callable = math.tanh, nodes: dict[int, str] = None, connections: dict[tuple[int, int], dict[str, float | bool]] = None):
+    def __init__(self, input_units: int = None, units_1d: int = None, units_3d: int = None, beginning_connections: int = 2, activation_function: Callable = math.tanh, nodes: dict[int, str] = None, connections: dict[tuple[int, int], dict[str, float | bool]] = None):
         """
-        Initialize the neural network with input and output units.
+        Initialize a NEAT-style neural network with input and output units.
+
+        The network can be initialized either from existing nodes and connections,
+        or generated from scratch with a specified number of input and output neurons.
+        Optionally, a sparse random set of initial connections can be created.
 
         Args:
-            input_units (int): Number of input neurons.
-            units_1d (int): Number of 1D output units.
-            units_3d (int): Number of 3D output units (each counts as 3 neurons).
-            activation_function (Callable): Activation function applied to hidden/output nodes.
+            input_units (int, optional): Number of input neurons.
+            units_1d (int, optional): Number of 1D output units.
+            units_3d (int, optional): Number of 3D output units (each counts as 3 neurons).
+            beginning_connections (int, optional): Number of random connections to create initially if nodes/connections are not provided. Default is 2.
+            activation_function (Callable, optional): Activation function applied to hidden/output nodes. Default is math.tanh.
+            nodes (dict[int, str], optional): Existing nodes to initialize the network. Keys are node IDs, values are types ("input", "hidden", "output").
+            connections (dict[tuple[int, int], dict[str, float | bool]], optional): Existing connections to initialize the network. Keys are (source, target) tuples.
         """
 
         if nodes is not None and connections is not None:
@@ -43,9 +50,11 @@ class NeuralNetwork:
             self.activation_function = activation_function
             self.fitness_value = None
 
-            for input in range(self.input_units):
-                for output in range(self.input_units, self.output_units + self.input_units):
-                    self.connections[(input, output)] = {"weight": random.uniform(-1,1), "enabled": random.choice([True, False])}
+            for _ in range(beginning_connections):
+                connection = (random.randint(0, self.input_units - 1), random.randint(self.input_units, self.input_units + self.output_units - 1))
+                while connection in self.connections:
+                    connection = (random.randint(0, self.input_units - 1), random.randint(self.input_units, self.input_units + self.output_units - 1))
+                self.connections[connection] = {"weight": random.uniform(-1,1), "enabled": True}
 
 
     def change_weight(self, connection: tuple[int, int], new_weight: float) -> None:
