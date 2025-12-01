@@ -4,6 +4,7 @@ from datetime import datetime
 import json
 import logging
 from pathlib import Path
+import matplotlib 
 from matplotlib import pyplot as plt
 import pybullet as p
 
@@ -15,6 +16,7 @@ from evolution.population import calculate_new_species_sizes, create_next_genera
 from evolution.visualization import Visualization
 from simulation.simulation import Simulation
 
+matplotlib.use('Agg')
 
 class GeneticAlgorithm:
     def __init__(self, params: GeneticAlgorithmParams):
