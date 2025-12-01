@@ -60,6 +60,7 @@ def run_individual(indiv: NeuralNetwork, sim: Simulation, params: GeneticAlgorit
 
 
     while not params.run_conditions.isRunEnd(sim):
+        print(sim.get_base_state()[0])
         creature_state = params.state_getter.get_state(sim)
         
         indiv_output = indiv.forward(creature_state)

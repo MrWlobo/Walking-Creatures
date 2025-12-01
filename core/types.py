@@ -98,6 +98,26 @@ class TimeOnlyRunConditions(RunConditions):
         return f"{type(self).__name__}(max_time_seconds={self.max_time_seconds})"
 
 
+class FallOrTimeoutRunConditions(RunConditions):
+    """A RunConditions impelementation that sets a time limit for the simulations and ends the simulation
+    when the creature falls over.
+    """
+    def __init__(self, max_time_seconds: float, height_threshold: float):
+        self.max_time_seconds = max_time_seconds
+        self.height_threshold = height_threshold
+    
+
+    def isRunEnd(self, sim: Simulation) -> bool:
+        is_time_up = sim.tick_count * sim.time_step >= self.max_time_seconds
+        has_fallen = sim.get_base_state()[0][2] < self.height_threshold
+        
+        return is_time_up or has_fallen
+    
+    
+    def __repr__(self):
+        return f"{type(self).__name__}(max_time_seconds={self.max_time_seconds}, height_threshold={self.height_threshold})"
+
+
 # creature state getters
 #################
 

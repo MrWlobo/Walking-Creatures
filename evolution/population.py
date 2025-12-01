@@ -1,5 +1,6 @@
 import copy
 import random
+import numpy as np
 
 from core.types import GeneticAlgorithmParams
 from evolution.genetic import crossover, mutate
@@ -184,6 +185,9 @@ def calculate_new_species_sizes(species: list[list[NeuralNetwork]]) -> list[int]
     population_size = sum(len(s) for s in species)
     adjusted_fitness_values = [[individual.fitness_value / len(spc) for individual in spc] for spc in species]
     mean_adjusted_fitness = sum([sum(values) for values in adjusted_fitness_values]) / population_size
+    
+    if np.abs(mean_adjusted_fitness) < 0.0001:
+        mean_adjusted_fitness = 0.0001
 
     new_sizes = []
 
