@@ -48,8 +48,6 @@ def mutate(probabilities: list[int], individual: NeuralNetwork) -> None:
         individual (NeuralNetwork): The neural network to mutate.
     """
 
-    indiv_copy = copy.deepcopy(individual)
-
     if len(probabilities) != 3:
         raise ValueError("There should be exactly 3 values in probabilities.")
 
@@ -59,18 +57,18 @@ def mutate(probabilities: list[int], individual: NeuralNetwork) -> None:
     selected = random.uniform(1, 100)
 
     if selected <= probabilities[0]:
-        connection = random.choice(list(indiv_copy.connections.keys()))
-        _mutate_weight(connection, indiv_copy)
+        connection = random.choice(list(individual.connections.keys()))
+        _mutate_weight(connection, individual)
 
     elif selected <= (probabilities[0] + probabilities[1]):
         success = False
         while not success:
-            node_pairs = [(a, b) for a in indiv_copy.nodes for b in indiv_copy.nodes
+            node_pairs = [(a, b) for a in individual.nodes for b in individual.nodes
                         if a != b]
             if not node_pairs:
                 break
             connection = random.choice(node_pairs)
-            success = _mutate_connection(connection, indiv_copy)
+            success = _mutate_connection(connection, individual)
 
     else:
         success = False
@@ -78,7 +76,7 @@ def mutate(probabilities: list[int], individual: NeuralNetwork) -> None:
             connection = random.choice(list(individual.connections.keys()))
             success = _mutate_node(connection, individual)
     
-    return indiv_copy
+    return individual
 
 
 def _mutate_weight(connection: tuple[int, int], individual: NeuralNetwork) -> None:
