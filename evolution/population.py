@@ -161,7 +161,20 @@ def _individuals_within_compatibility_distance(network1: NeuralNetwork, network2
 def calculate_new_species_sizes(species: list[list[NeuralNetwork]]) -> list[int]:
     """
     Calculate the new number of individuals for each species based on adjusted fitness.
+    Each species' size is determined relative to the population mean adjusted fitness:
+    - Species with above-average fitness grow.
+    - Species with below-average fitness shrink.
+    - The total number of individuals across all species remains constant.
+    
     Uses proportional allocation to ensure stability.
+    Args:
+        species (list[list[NeuralNetwork]]): A list of species, where each species is a list of NeuralNetwork instances.
+            Each NeuralNetwork is expected to have a 'fitness_value' attribute.
+    Returns:
+        list[int]: A list of integers representing the new sizes of each species.
+            The sum of all integers equals the total population size.
+    Raises:
+        ValueError: If the input list of species is empty.
     """
     if not species:
         raise ValueError("Number of species cannot be 0.")
