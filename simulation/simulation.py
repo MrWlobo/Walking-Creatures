@@ -45,7 +45,7 @@ class Simulation:
         
         # load creature at origin (temp)
         start_orientation = p.getQuaternionFromEuler([0, 0, 0], physicsClientId=self.client_id)
-        temp_start_pos = [0, 0, 0]
+        temp_start_pos = [0, 0, 2.0]
         self.creatureId = p.loadURDF(str(creature_path), 
                                     temp_start_pos, 
                                     start_orientation, 
@@ -104,8 +104,14 @@ class Simulation:
             global_min_z = min(global_min_z, link_aabb[0][2])
 
         # calculate spawn height and teleport
-        buffer = 0.001 # a buffer to ensure the creature doesn't clip into the ground
-        spawn_z = -global_min_z + buffer
+        current_base_pos, _ = p.getBasePositionAndOrientation(self.creatureId, physicsClientId=self.client_id)
+        current_base_z = current_base_pos[2]
+
+        leg_length = current_base_z - global_min_z
+
+        buffer = 0.005 # a buffer to ensure the creature doesn't clip into the ground
+        spawn_z = leg_length + buffer
+        
         start_position = [0, 0, spawn_z]
         p.resetBasePositionAndOrientation(self.creatureId, 
                                         start_position, 
