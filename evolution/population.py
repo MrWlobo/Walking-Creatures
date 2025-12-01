@@ -161,48 +161,45 @@ def _individuals_within_compatibility_distance(network1: NeuralNetwork, network2
 def calculate_new_species_sizes(species: list[list[NeuralNetwork]]) -> list[int]:
     """
     Calculate the new number of individuals for each species based on adjusted fitness.
-
     Each species' size is determined relative to the population mean adjusted fitness:
     - Species with above-average fitness grow.
     - Species with below-average fitness shrink.
     - The total number of individuals across all species remains constant.
-
+    
+    Uses proportional allocation to ensure stability.
     Args:
         species (list[list[NeuralNetwork]]): A list of species, where each species is a list of NeuralNetwork instances.
             Each NeuralNetwork is expected to have a 'fitness_value' attribute.
-
     Returns:
         list[int]: A list of integers representing the new sizes of each species.
             The sum of all integers equals the total population size.
-
     Raises:
         ValueError: If the input list of species is empty.
     """
-
     if not species:
         raise ValueError("Number of species cannot be 0.")
 
     population_size = sum(len(s) for s in species)
+
     adjusted_fitness_values = [[individual.fitness_value / len(spc) for individual in spc] for spc in species]
-    mean_adjusted_fitness = sum([sum(values) for values in adjusted_fitness_values]) / population_size
-    
-    if np.abs(mean_adjusted_fitness) < 0.0001:
-        mean_adjusted_fitness = 0.0001
+
+    total_adj_fitness = sum(sum(values) for values in adjusted_fitness_values)
 
     new_sizes = []
 
-    for values in adjusted_fitness_values:
-        new_size = int(sum(values) / mean_adjusted_fitness)
-        new_sizes.append(new_size)
+    if total_adj_fitness == 0:
+        base_size = population_size // len(species)
+        new_sizes = [base_size] * len(species)
+    else:
+        for values in adjusted_fitness_values:
+            species_sum = sum(values)
+            size = int((species_sum / total_adj_fitness) * population_size)
+            new_sizes.append(size)
 
-    if sum(new_sizes) < population_size:
-        largest_species_index = 0
-        largest_species_count = 0
-        for i in range(len(new_sizes)):
-            if new_sizes[i] > largest_species_count:
-                largest_species_index = i
-                largest_species_count = new_sizes[i]
-
-        new_sizes[largest_species_index] += (population_size - sum(new_sizes))
+    diff = population_size - sum(new_sizes)
+    
+    if diff != 0:
+        largest_species_index = new_sizes.index(max(new_sizes))
+        new_sizes[largest_species_index] += diff
 
     return new_sizes
