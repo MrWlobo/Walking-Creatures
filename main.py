@@ -13,19 +13,19 @@ def run_genetic_algorithm(params: GeneticAlgorithmParams):
 
 if __name__ == "__main__":
     params = GeneticAlgorithmParams(
-        creature_path=Path(__file__).parent / "assets/creatures" / "6-revolute_biped.urdf",
+        creature_path=Path(__file__).parent / "assets/creatures" / "1-spherical_hopper.urdf",
         results_path=Path(__file__).parent / "results",
         
         fitness=XDistanceStabilityFitness(stability_coefficient=0.01),
-        selection=TournamentSelection(tournament_size=5),
+        selection=TournamentSelection(tournament_size=10),
         state_getter=FullJointStateGetter(),
         run_conditions=FallOrTimeoutRunConditions(max_time_seconds=10, height_threshold=0.3),
         
-        population_size=5000,
+        population_size=1000,
         n_generations=100,
         
-        succession_ratio=0.001,
-        genetic_operation_ratios=(0.7, 0.25),
+        succession_ratio=0.005,
+        genetic_operation_ratios=(0.7, 0.3),
         mutation_type_percentages=[75, 20, 5],
         
         indiv_output_scale=0.1,

@@ -42,48 +42,61 @@ def generate_random_individual(input_units: int, units_1d: int, units_3d: int) -
 
 
 def create_next_generation(population: list[list[NeuralNetwork]], new_species_sizes: list[int], params: GeneticAlgorithmParams) -> list[NeuralNetwork]:
-    """Creates a new (not speciated) population from an old (speciated) population.
-
-    Args:
-        population (list[list[NeuralNetwork]]): The speciated population the generate the new population from.
-        new_species_sizes (list[int]): The respective desired sizes of each species in the population. 
-        params (GeneticAlgorithmParams): Parameters of the GA.
-
-    Returns:
-        list[NeuralNetwork]: The new population, without defined species.
-    """
+    """Creates a new (not speciated) population from an old (speciated) population."""
+    
     if len(population) != len(new_species_sizes):
-        raise ValueError(f"Number of species doesn't match number of new species sizes list, population: {population}, species sizes: {new_species_sizes}")
+        raise ValueError(f"Number of species ({len(population)}) doesn't match new species sizes ({len(new_species_sizes)}).")
     
     crossover_thresh = params.genetic_operation_ratios[0]
-    
     new_population = []
     
     for species, new_size in zip(population, new_species_sizes):
-        n_successions = int(np.floor(params.succession_ratio * new_size))
-        elite_indivs = copy.deepcopy(heapq.nlargest(n_successions, species, key=lambda i: i.fitness_value))
-        
-        new_population.extend(elite_indivs)
-        
-        for _ in range(new_size - n_successions):
-            r = random.random()
+        if new_size <= 0:
+            continue
             
+        # elitism
+        n_successions = int(np.floor(params.succession_ratio * new_size))
+        n_successions = min(n_successions, new_size)
+        elite_indivs = heapq.nlargest(n_successions, species, key=lambda i: i.fitness_value)
+        
+        new_species_pop = [copy.deepcopy(i) for i in elite_indivs]
+        
+        if len(new_species_pop) > new_size:
+            new_species_pop = new_species_pop[:new_size]
+        
+        while len(new_species_pop) < new_size:
             offspring = None
             
-            if r < crossover_thresh:
-                indiv1, indiv2 = params.selection.select(species), params.selection.select(species)
-                offspring = crossover(indiv1, indiv2)
+            # if species is empty or too small for crossover
+            if not species:
+                offspring = generate_random_individual(params.input_units, params.units_1d, params.units_3d)
             else:
-                indiv = params.selection.select(species)
-                offspring = mutate(params.mutation_type_percentages, copy.deepcopy(indiv))
+                r = random.random()
+                
+                # perform crossover if rolled and we have at least 2 parents to cross
+                if r < crossover_thresh and len(species) > 1:
+                    indiv1 = params.selection.select(species)
+                    indiv2 = params.selection.select(species)
+                    offspring = crossover(indiv1, indiv2)
+                else:
+                    # mutate otherwise
+                    indiv = params.selection.select(species)
+                    offspring = mutate(params.mutation_type_percentages, copy.deepcopy(indiv))
             
             if not isinstance(offspring, NeuralNetwork):
                 raise RuntimeError(f"Offspring of type {type(offspring)} was generated instead of NeuralNetwork.")
             
-            new_population.append(offspring)
-    
-    if sum([len(species) for species in population]) != len(new_population):
-        raise RuntimeError(f"New population size={len(new_population)} is not equal to the old population size={sum([len(species) for species in population])}")
+            new_species_pop.append(offspring)
+            
+        # add this species' new members to the main pool
+        new_population.extend(new_species_pop)
+
+    # final check
+    old_pop_size = sum(len(s) for s in population)
+    if len(new_population) != old_pop_size:
+        # if this raises, the error is likely in 'calculate_new_species_sizes'
+        raise RuntimeError(f"New population size={len(new_population)} is not equal to old size={old_pop_size}. "
+                            f"Target sizes sum: {sum(new_species_sizes)}")
     
     return new_population
 
@@ -183,7 +196,16 @@ def calculate_new_species_sizes(species: list[list[NeuralNetwork]]) -> list[int]
 
     population_size = sum(len(s) for s in species)
 
-    adjusted_fitness_values = [[individual.fitness_value / len(spc) for individual in spc] for spc in species]
+    min_fitness = min(ind.fitness_value for s in species for ind in s)
+    
+    offset = 0
+    if min_fitness < 0:
+        offset = abs(min_fitness)
+
+    adjusted_fitness_values = []
+    for spc in species:
+        adj_values = [(ind.fitness_value + offset) / len(spc) for ind in spc]
+        adjusted_fitness_values.append(adj_values)
 
     total_adj_fitness = sum(sum(values) for values in adjusted_fitness_values)
 
