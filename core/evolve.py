@@ -111,3 +111,5 @@ class GeneticAlgorithm:
         best_indiv = max([max(species, key=lambda i: i.fitness_value) for species in curr_species], key=lambda i: i.fitness_value)
         serialize_network(best_indiv, GEN_DIR, "best_individual")
         viz.visualize_network(best_indiv, ax, "best_individual_img", save_image=True, show_image=False)
+        
+        plt.close(fig)

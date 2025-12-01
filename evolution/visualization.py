@@ -38,7 +38,7 @@ class Visualization:
         network : NeuralNetwork
             The neural network object to visualize. It must provide:
                 - `network.nodes`: dict mapping node_id → node_type
-                  where node_type ∈ {"input", "hidden", "output"}.
+                    where node_type ∈ {"input", "hidden", "output"}.
                 - `network.connections`: dict mapping (src, tgt) → {"enabled": bool, "weight": float}
 
         axis : matplotlib.axes.Axes
@@ -201,6 +201,7 @@ class Visualization:
         if show_image:
             plt.show()
 
+
     def visualize_population_with_fittest_individual(self, population: list[list[NeuralNetwork]], current_generation: int, filename: str, save_image: bool = False, show_image: bool = True) -> None:
         """
         Visualize a population of NEAT networks alongside the fittest individual.
@@ -260,3 +261,5 @@ class Visualization:
 
         if show_image:
             plt.show()
+        
+        plt.close(figure)
