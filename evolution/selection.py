@@ -44,13 +44,6 @@ class TournamentSelection(Selection):
         if not population:
             raise ValueError("Cannot select from an empty population.")
 
-        if self.tournament_size >= len(population):
-            logging.basicConfig(
-                level=logging.WARNING,
-                format='\033[93m%(levelname)s: %(message)s\033[0m',
-                force=True 
-            )
-            logging.warning(f"Species with size ({len(population)}) smaller than tournament size ({self.tournament_size}) encountered.")
         current_tournament_size = min(self.tournament_size, len(population))
 
         tournament = random.sample(population, current_tournament_size)

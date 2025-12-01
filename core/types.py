@@ -25,7 +25,8 @@ class GeneticAlgorithmParams:
         run_conditions (RunConditions): Defines the conditions for the simulation to end (e.g. time limit).
         population_size (int): Number of individuals in each generation.
         n_generations (int): Number of generations to rune the genetic algorithm for.
-        genetic_operation_ratios (tuple[float, float, float]): Probabilities of applying crossover, mutation and succesion 
+        succession_ratio (float): Percentage of top individuals to copy to the next population each generation.
+        genetic_operation_ratios (tuple[float, float]): Probabilities of applying crossover and mutation
                                                                 operations, respectively.
         mutation_type_percentages (list[float]): List of 3 integers representing percent chance for 
                                                     [0] mutate weight, [1] mutate connection, [2] mutate node. Must sum to 100.
@@ -48,7 +49,8 @@ class GeneticAlgorithmParams:
     run_conditions: RunConditions
     population_size: int
     n_generations: int
-    genetic_operation_ratios: tuple[float, float, float]
+    succession_ratio: float
+    genetic_operation_ratios: tuple[float, float]
     mutation_type_percentages: list[float]
     indiv_output_scale: float
     speciation_coefficients: tuple[float, float, float]
@@ -87,6 +89,11 @@ class TimeOnlyRunConditions(RunConditions):
     """A RunConditions impelementation that sets a time limit for the simulations.
     """
     def __init__(self, max_time_seconds: float):
+        """Initializes a TimeOnlyRunConditions object.
+
+        Args:
+            max_time_seconds (float): _description_
+        """
         self.max_time_seconds = max_time_seconds
     
 

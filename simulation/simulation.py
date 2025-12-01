@@ -27,7 +27,7 @@ class Simulation:
         self.gui_enabled = (simulation_type == p.GUI)
         self.time_step = time_step
 
-        self.client_id = p.connect(simulation_type, options="--verbose=0") 
+        self.client_id = p.connect(simulation_type) 
         
         p.setRealTimeSimulation(0, physicsClientId=self.client_id)
         p.setTimeStep(self.time_step, physicsClientId=self.client_id)

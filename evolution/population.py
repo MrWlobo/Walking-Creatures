@@ -1,4 +1,5 @@
 import copy
+import heapq
 import random
 import numpy as np
 
@@ -55,12 +56,16 @@ def create_next_generation(population: list[list[NeuralNetwork]], new_species_si
         raise ValueError(f"Number of species doesn't match number of new species sizes list, population: {population}, species sizes: {new_species_sizes}")
     
     crossover_thresh = params.genetic_operation_ratios[0]
-    mutation_thresh = crossover_thresh + params.genetic_operation_ratios[1]
     
     new_population = []
     
     for species, new_size in zip(population, new_species_sizes):
-        for _ in range(new_size):
+        n_successions = int(np.floor(params.succession_ratio * new_size))
+        elite_indivs = copy.deepcopy(heapq.nlargest(n_successions, species, key=lambda i: i.fitness_value))
+        
+        new_population.extend(elite_indivs)
+        
+        for _ in range(new_size - n_successions):
             r = random.random()
             
             offspring = None
@@ -68,12 +73,9 @@ def create_next_generation(population: list[list[NeuralNetwork]], new_species_si
             if r < crossover_thresh:
                 indiv1, indiv2 = params.selection.select(species), params.selection.select(species)
                 offspring = crossover(indiv1, indiv2)
-            elif r < mutation_thresh:
-                indiv = params.selection.select(species)
-                offspring = mutate(params.mutation_type_percentages, copy.deepcopy(indiv))
             else:
                 indiv = params.selection.select(species)
-                offspring = copy.deepcopy(indiv)
+                offspring = mutate(params.mutation_type_percentages, copy.deepcopy(indiv))
             
             if not isinstance(offspring, NeuralNetwork):
                 raise RuntimeError(f"Offspring of type {type(offspring)} was generated instead of NeuralNetwork.")
