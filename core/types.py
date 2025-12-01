@@ -25,6 +25,7 @@ class GeneticAlgorithmParams:
         run_conditions (RunConditions): Defines the conditions for the simulation to end (e.g. time limit).
         population_size (int): Number of individuals in each generation.
         n_generations (int): Number of generations to rune the genetic algorithm for.
+        initial_connections (int): Number of initial random connections between neurons of each individual.
         succession_ratio (float): Percentage of top individuals to copy to the next population each generation.
         genetic_operation_ratios (tuple[float, float]): Probabilities of applying crossover and mutation
                                                                 operations, respectively.
@@ -49,6 +50,7 @@ class GeneticAlgorithmParams:
     run_conditions: RunConditions
     population_size: int
     n_generations: int
+    initial_connections: int
     succession_ratio: float
     genetic_operation_ratios: tuple[float, float]
     mutation_type_percentages: list[float]

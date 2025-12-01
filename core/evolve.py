@@ -37,7 +37,8 @@ class GeneticAlgorithm:
             self.params.population_size, 
             self.input_units, 
             self.units_1d, 
-            self.units_3d
+            self.units_3d,
+            self.params.initial_connections,
         )
         
         # create dir to store GA run results

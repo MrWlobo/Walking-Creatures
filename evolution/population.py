@@ -8,7 +8,7 @@ from evolution.genetic import crossover, mutate
 from evolution.neural_network import NeuralNetwork
 
 
-def generate_random_population(n_individuals: int, input_units: int, units_1d: int, units_3d: int) -> list[NeuralNetwork]:
+def generate_random_population(n_individuals: int, input_units: int, units_1d: int, units_3d: int, initial_connections: int) -> list[NeuralNetwork]:
     """Generate a new population of n_individuals random NEAT-style neural networks.
 
     Args:
@@ -16,15 +16,16 @@ def generate_random_population(n_individuals: int, input_units: int, units_1d: i
         input_units (int): Number of 1D output neurons.
         units_1d (int): Number of 1D output neurons.
         units_3d (int): Number of 3D output neurons (each counts as 3 neurons).
+        initial_connections (int): Number of initial random connections in each NN.
 
     Returns:
         list[NeuralNetwork]: A new population of networks with fully connected input-to-output layers,
                                 with random weights and random enabled/disabled connections.
     """
-    return [generate_random_individual(input_units, units_1d, units_3d) for _ in range(n_individuals)]
+    return [generate_random_individual(input_units, units_1d, units_3d, initial_connections) for _ in range(n_individuals)]
 
 
-def generate_random_individual(input_units: int, units_1d: int, units_3d: int) -> NeuralNetwork:
+def generate_random_individual(input_units: int, units_1d: int, units_3d: int, initial_connections: int) -> NeuralNetwork:
     """
     Generate a new random NEAT-style neural network.
 
@@ -32,12 +33,13 @@ def generate_random_individual(input_units: int, units_1d: int, units_3d: int) -
         input_units (int): Number of input neurons.
         units_1d (int): Number of 1D output neurons.
         units_3d (int): Number of 3D output neurons (each counts as 3 neurons).
+        initial_connections (int): Number of initial random connections in NN.
 
     Returns:
         NeuralNetwork: A new network with fully connected input-to-output layers,
                         with random weights and random enabled/disabled connections.
     """
-    network = NeuralNetwork(input_units, units_1d, units_3d)
+    network = NeuralNetwork(input_units, units_1d, units_3d, beginning_connections=initial_connections)
     return network
 
 
@@ -69,7 +71,7 @@ def create_next_generation(population: list[list[NeuralNetwork]], new_species_si
             
             # if species is empty or too small for crossover
             if not species:
-                offspring = generate_random_individual(params.input_units, params.units_1d, params.units_3d)
+                offspring = generate_random_individual(params.input_units, params.units_1d, params.units_3d, params.initial_connections)
             else:
                 r = random.random()
                 
