@@ -34,7 +34,9 @@ class NeuralNetwork:
             nodes (dict[int, str], optional): Existing nodes to initialize the network. Keys are node IDs, values are types ("input", "hidden", "output").
             connections (dict[tuple[int, int], dict[str, float | bool]], optional): Existing connections to initialize the network. Keys are (source, target) tuples.
         """
-
+        random.seed()
+        np.random.seed()
+        
         if nodes is not None and connections is not None:
             self.input_units = len([n for n, t in nodes.items() if t == "input"])
             self.output_units = len([n for n, t in nodes.items() if t == "output"])

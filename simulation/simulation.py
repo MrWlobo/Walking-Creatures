@@ -1,3 +1,4 @@
+import random
 import pybullet as p
 import pybullet_data
 from pathlib import Path
@@ -24,10 +25,15 @@ class Simulation:
             raise ValueError(f"Invalid simulation_type. "
                             f"Must be p.GUI or p.DIRECT, but got {simulation_type}")
         
+        random.seed(42)
+        np.random.seed(42)
+        
         self.gui_enabled = (simulation_type == p.GUI)
         self.time_step = time_step
 
-        self.client_id = p.connect(simulation_type) 
+        self.client_id = p.connect(simulation_type)
+        # necessary for reproducibility
+        p.setPhysicsEngineParameter(deterministicOverlappingPairs=1) 
         
         p.setRealTimeSimulation(0, physicsClientId=self.client_id)
         p.setTimeStep(self.time_step, physicsClientId=self.client_id)
