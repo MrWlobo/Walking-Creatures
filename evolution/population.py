@@ -68,7 +68,7 @@ def create_next_generation(population: list[list[NeuralNetwork]], new_species_si
                 continue
             
             # elitism
-            n_successions = int(np.floor(params.succession_ratio * new_size))
+            n_successions = int(np.ceil(params.succession_ratio * new_size))
             n_successions = min(n_successions, new_size)
             
             elite_indivs = heapq.nlargest(n_successions, species, key=lambda i: i.fitness_value)

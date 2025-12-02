@@ -118,7 +118,7 @@ class GeneticAlgorithm:
         viz.visualize_population_with_fittest_individual(curr_species, generation, "populatio_with_fittes_indiv_img", save_image=True, show_image=False)
         
         # save fittest individual and its visualisation
-        best_indiv = max([max(species, key=lambda i: i.fitness_value) for species in curr_species], key=lambda i: i.fitness_value)
+        best_indiv = max([max(species, key=lambda i: i.fitness_info) for species in curr_species], key=lambda i: i.fitness_info)
         serialize_network(best_indiv, GEN_DIR, "best_individual")
         viz.visualize_network(best_indiv, ax, "best_individual_img", save_image=True, show_image=False)
         
