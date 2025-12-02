@@ -1,3 +1,4 @@
+import math
 import pickle
 from dataclasses import asdict
 from datetime import datetime
@@ -19,8 +20,14 @@ from simulation.simulation import Simulation
 matplotlib.use('Agg')
 
 class GeneticAlgorithm:
+    """A Genetic Algorithm class.
+    1. Initialize with a GeneticAlgorithmParams object.
+    2. Call evolve().
+    """
     def __init__(self, params: GeneticAlgorithmParams):
         self.params: GeneticAlgorithmParams = params
+        
+        self._check_params_validity()
     
         # calculate NN input and output dimensions
         temp_sim = Simulation(p.DIRECT, self.params.creature_path)
@@ -116,3 +123,55 @@ class GeneticAlgorithm:
         viz.visualize_network(best_indiv, ax, "best_individual_img", save_image=True, show_image=False)
         
         plt.close('all')
+    
+    
+    def _check_params_validity(self):
+        p = self.params
+        
+        if not p.creature_path.exists():
+            raise FileNotFoundError(f"The creature file was not found at: {p.creature_path}")
+        
+        if p.creature_path.suffix != '.urdf':
+            raise ValueError(f"Creature file must be a .urdf file. Got: {p.creature_path.suffix}")
+        
+        if not p.results_path.exists():
+            raise FileNotFoundError(f"The results base directory does not exist: {p.results_path}")
+
+        if any(x is None for x in [p.fitness, p.selection, p.state_getter, p.run_conditions]):
+            raise ValueError("fitness, selection, state_getter, and run_conditions must be initialized objects, not None.")
+
+        if p.population_size < 2:
+            raise ValueError(f"Population size must be at least 2 to allow for crossover. Got: {p.population_size}")
+
+        if p.n_generations < 1:
+            raise ValueError(f"Number of generations must be at least 1. Got: {p.n_generations}")
+        
+        if p.initial_connections < 0:
+            raise ValueError(f"Initial connections cannot be negative. Got: {p.initial_connections}")
+
+        if not (0.0 <= p.succession_ratio <= 1.0):
+            raise ValueError(f"succession_ratio must be between 0.0 and 1.0. Got: {p.succession_ratio}")
+
+        if len(p.genetic_operation_ratios) != 2:
+            raise ValueError("genetic_operation_ratios must be a tuple of length 2 (crossover, mutation).")
+        
+        if not all(0.0 <= r <= 1.0 for r in p.genetic_operation_ratios):
+            raise ValueError("All values in genetic_operation_ratios must be between 0.0 and 1.0.")
+
+        if len(p.mutation_type_percentages) != 3:
+            raise ValueError("mutation_type_percentages must have exactly 3 values [weight, connection, node].")
+        
+        if not math.isclose(sum(p.mutation_type_percentages), 100.0, rel_tol=1e-5):
+            raise ValueError(f"mutation_type_percentages must sum to 100. Got sum: {sum(p.mutation_type_percentages)}")
+
+        if len(p.speciation_coefficients) != 3:
+            raise ValueError("speciation_coefficients must have exactly 3 values.")
+        
+        if p.speciation_compatibility_distance < 0:
+            raise ValueError("speciation_compatibility_distance must be non-negative.")
+
+        if p.n_processes is not None and p.n_processes < 1:
+            raise ValueError(f"n_processes must be None (auto) or a positive integer. Got: {p.n_processes}")
+        
+        if p.time_step <= 0:
+            raise ValueError("time_step must be positive.")

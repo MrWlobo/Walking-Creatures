@@ -62,12 +62,11 @@ def mutate(probabilities: list[int], individual: NeuralNetwork) -> None:
 
     elif selected <= (probabilities[0] + probabilities[1]):
         success = False
-        while not success:
-            node_pairs = [(a, b) for a in individual.nodes for b in individual.nodes
-                        if a != b]
-            if not node_pairs:
-                break
-            connection = random.choice(node_pairs)
+        possible_pairs = [(a, b) for a in individual.nodes for b in individual.nodes if a != b]
+        random.shuffle(possible_pairs)
+        
+        while possible_pairs and not success:
+            connection = possible_pairs.pop()
             success = _mutate_connection(connection, individual)
 
     else:
