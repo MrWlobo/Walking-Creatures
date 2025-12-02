@@ -1,5 +1,7 @@
 import copy
 import heapq
+import multiprocessing
+import os
 import random
 import numpy as np
 
@@ -44,63 +46,109 @@ def generate_random_individual(input_units: int, units_1d: int, units_3d: int, i
 
 
 def create_next_generation(population: list[list[NeuralNetwork]], new_species_sizes: list[int], params: GeneticAlgorithmParams) -> list[NeuralNetwork]:
-    """Creates a new (not speciated) population from an old (speciated) population."""
+    """Creates a new (not speciated) population from an old (speciated) population.
+    
+    The process is parallelized, using batches to minimize communication between threads.
+    """
     
     if len(population) != len(new_species_sizes):
         raise ValueError(f"Number of species ({len(population)}) doesn't match new species sizes ({len(new_species_sizes)}).")
+        
+    if params.n_processes is None:
+        num_processes = os.cpu_count() or 1
+    else:
+        num_processes = params.n_processes
     
-    crossover_thresh = params.genetic_operation_ratios[0]
     new_population = []
     
-    for species, new_size in zip(population, new_species_sizes):
-        if new_size <= 0:
-            continue
+    with multiprocessing.Pool(processes=num_processes) as pool:
+        
+        for species, new_size in zip(population, new_species_sizes):
+            if new_size <= 0:
+                continue
             
-        # elitism
-        n_successions = int(np.floor(params.succession_ratio * new_size))
-        n_successions = min(n_successions, new_size)
-        elite_indivs = heapq.nlargest(n_successions, species, key=lambda i: i.fitness_value)
-        
-        new_species_pop = [copy.deepcopy(i) for i in elite_indivs]
-        
-        if len(new_species_pop) > new_size:
-            new_species_pop = new_species_pop[:new_size]
-        
-        while len(new_species_pop) < new_size:
-            offspring = None
+            # elitism
+            n_successions = int(np.floor(params.succession_ratio * new_size))
+            n_successions = min(n_successions, new_size)
             
-            # if species is empty or too small for crossover
-            if not species:
-                offspring = generate_random_individual(params.input_units, params.units_1d, params.units_3d, params.initial_connections)
-            else:
-                r = random.random()
+            elite_indivs = heapq.nlargest(n_successions, species, key=lambda i: i.fitness_value)
+            new_species_pop = [copy.deepcopy(i) for i in elite_indivs]
+            
+            if len(new_species_pop) > new_size:
+                new_species_pop = new_species_pop[:new_size]
                 
-                # perform crossover if rolled and we have at least 2 parents to cross
-                if r < crossover_thresh and len(species) > 1:
-                    indiv1 = params.selection.select(species)
-                    indiv2 = params.selection.select(species)
-                    offspring = crossover(indiv1, indiv2)
-                else:
-                    # mutate otherwise
-                    indiv = params.selection.select(species)
-                    offspring = mutate(params.mutation_type_percentages, copy.deepcopy(indiv))
+            remaining_spots = new_size - len(new_species_pop)
             
-            if not isinstance(offspring, NeuralNetwork):
-                raise RuntimeError(f"Offspring of type {type(offspring)} was generated instead of NeuralNetwork.")
+            if remaining_spots > 0:
+                tasks = []
+                
+                base_chunk = remaining_spots // num_processes
+                remainder = remaining_spots % num_processes
+                
+                for i in range(num_processes):
+                    count = base_chunk + (1 if i < remainder else 0)
+                    
+                    if count > 0:
+                        tasks.append((species, count, params))
+                
+                if tasks:
+                    results = pool.map(_generate_offspring_batch, tasks)
+                    for batch in results:
+                        new_species_pop.extend(batch)
             
-            new_species_pop.append(offspring)
-            
-        # add this species' new members to the main pool
-        new_population.extend(new_species_pop)
+            new_population.extend(new_species_pop)
 
     # final check
-    old_pop_size = sum(len(s) for s in population)
-    if len(new_population) != old_pop_size:
-        # if this raises, the error is likely in 'calculate_new_species_sizes'
-        raise RuntimeError(f"New population size={len(new_population)} is not equal to old size={old_pop_size}. "
-                            f"Target sizes sum: {sum(new_species_sizes)}")
-    
+    target_size = sum(new_species_sizes)
+    if len(new_population) != target_size:
+        raise RuntimeError(f"Generated {len(new_population)}, expected {target_size}")
+        
     return new_population
+
+
+def _generate_offspring_batch(args):
+    """
+    Worker: Generates 'batch_size' offspring for the provided species.
+    """
+    species, batch_size, params = args
+    
+    if batch_size <= 0:
+        return []
+
+    random.seed() 
+    np.random.seed()
+
+    batch_results = []
+    crossover_thresh = params.genetic_operation_ratios[0]
+    
+    for _ in range(batch_size):
+        offspring = None
+        
+        # if species is empty or too small for crossover
+        if not species:
+            offspring = generate_random_individual(
+                params.input_units, params.units_1d, params.units_3d, params.initial_connections
+            )
+        else:
+            r = random.random()
+            
+            # perform crossover if rolled and we have at least 2 parents to cross
+            if r < crossover_thresh and len(species) > 1:
+                indiv1 = params.selection.select(species)
+                indiv2 = params.selection.select(species)
+                offspring = crossover(indiv1, indiv2)
+            else:
+                # mutate otherwise
+                indiv = params.selection.select(species)
+                offspring = mutate(params.mutation_type_percentages, copy.deepcopy(indiv))
+        
+        if not isinstance(offspring, NeuralNetwork):
+            raise RuntimeError(f"Worker generated {type(offspring)} instead of NeuralNetwork")
+        
+        # add this species' new members to the reults
+        batch_results.append(offspring)
+        
+    return batch_results
 
 
 def create_species(population: list[NeuralNetwork], coefficients: tuple[float, float, float], compatibility_distance: float) -> list[list[NeuralNetwork]]:
