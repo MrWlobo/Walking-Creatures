@@ -16,8 +16,8 @@ class GeneticAlgorithmParams:
     """Customizable parameters for the genetic algorithm. They should be consistent across the whole GA, as they are passed between many functions.
 
     Attributes:
-        creature_path (Path): Absolute path to .urdf creature model to use in the algorithm.
-        results_path (Path): Absolute path to a directory in which a new folder containing the GA run's results will be created.
+        creature_path (Path): Path (relative to the project path) to .urdf creature model to use in the algorithm.
+        results_path (Path): Path (relative to the project path) to a directory in which a new folder containing the GA run's results will be created.
         fitness (Fitness): The fitness function to base the GA on.
         selection (Selection): The method of selecting best individuals from a population to use.     
         state_getter (CreatureStateGetter): An object defining what data to extract from the simulation every tick 

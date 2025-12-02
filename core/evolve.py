@@ -27,10 +27,22 @@ class GeneticAlgorithm:
     def __init__(self, params: GeneticAlgorithmParams):
         self.params: GeneticAlgorithmParams = params
         
+        # check if paths are relative, to make saved results retrievable
+        if params.results_path.is_absolute():
+            raise ValueError(f"Results path should be a relative path, got: {params.results_path}")
+        
+        if params.creature_path.is_absolute():
+            raise ValueError(f"Creature path should be a relative path, got: {params.creature_path}")
+        
+        self.project_path = Path(__file__).parent.parent.resolve()
+        
+        self.results_path = self.project_path / params.results_path
+        self.creature_path = self.project_path / params.creature_path
+        
         self._check_params_validity()
     
         # calculate NN input and output dimensions
-        temp_sim = Simulation(p.DIRECT, self.params.creature_path)
+        temp_sim = Simulation(p.DIRECT, self.creature_path)
 
         self.units_1d: int = temp_sim.num_revolute # 2 values for each 1d joint
         self.units_3d: int = temp_sim.num_spherical # 2 3d vectors for each 3d joint
@@ -51,7 +63,7 @@ class GeneticAlgorithm:
         # create dir to store GA run results
         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         dir_name = f"run_{timestamp}"
-        self.save_dir: Path = self.params.results_path / dir_name
+        self.save_dir: Path = self.results_path / dir_name
         self.save_dir.mkdir(parents=True, exist_ok=True)
         
         # save GA params
@@ -60,6 +72,9 @@ class GeneticAlgorithm:
         
         with open((self.save_dir / "params.pkl").resolve(), "wb") as f:
             pickle.dump(self.params, f)
+        
+        self.global_best = NeuralNetwork(self.input_units, self.units_1d, self.units_3d)
+        self.global_best.fitness_info = float('-inf')
     
 
     def evolve(self):
@@ -113,14 +128,17 @@ class GeneticAlgorithm:
         viz = Visualization(GEN_DIR)
         fig, ax = plt.subplots(1, 1)
         
-        # save population plots
-        viz.visualize_population(curr_species, ax, "population_img", save_image=True, show_image=False)
-        viz.visualize_population_with_fittest_individual(curr_species, generation, "populatio_with_fittes_indiv_img", save_image=True, show_image=False)
+        # save population and fittest individual plots
+        viz.visualize_population_with_fittest_individual(curr_species, generation, "population_with_fittest_indiv_img", save_image=True, show_image=False)
         
-        # save fittest individual and its visualisation
+        # save fittest individual
         best_indiv = max([max(species, key=lambda i: i.fitness_info) for species in curr_species], key=lambda i: i.fitness_info)
-        serialize_network(best_indiv, GEN_DIR, "best_individual")
-        viz.visualize_network(best_indiv, ax, "best_individual_img", save_image=True, show_image=False)
+        serialize_network(best_indiv, GEN_DIR, "generation_fittest_individual")
+        
+        # save individual best across all generation
+        self.global_best = max([self.global_best, best_indiv], key=lambda i: i.fitness_info)
+        serialize_network(self.global_best, GEN_DIR, "global_fittest_individual")
+        viz.visualize_network(self.global_best, ax, "global_fittest_individual_img", save_image=True, show_image=False, title=f"Global fittest individual with a fitness value of {self.global_best.fitness_info}")
         
         plt.close('all')
     
@@ -128,14 +146,14 @@ class GeneticAlgorithm:
     def _check_params_validity(self):
         p = self.params
         
-        if not p.creature_path.exists():
-            raise FileNotFoundError(f"The creature file was not found at: {p.creature_path}")
+        if not self.creature_path.exists():
+            raise FileNotFoundError(f"The creature file was not found at: {self.creature_path}")
         
-        if p.creature_path.suffix != '.urdf':
-            raise ValueError(f"Creature file must be a .urdf file. Got: {p.creature_path.suffix}")
+        if self.creature_path.suffix != '.urdf':
+            raise ValueError(f"Creature file must be a .urdf file. Got: {self.creature_path.suffix}")
         
-        if not p.results_path.exists():
-            raise FileNotFoundError(f"The results base directory does not exist: {p.results_path}")
+        if not self.results_path.exists():
+            raise FileNotFoundError(f"The results base directory does not exist: {self.results_path}")
 
         if any(x is None for x in [p.fitness, p.selection, p.state_getter, p.run_conditions]):
             raise ValueError("fitness, selection, state_getter, and run_conditions must be initialized objects, not None.")

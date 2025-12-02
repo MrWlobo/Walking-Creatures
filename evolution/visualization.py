@@ -121,7 +121,7 @@ class Visualization:
         nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=7, ax=axis)
 
         # Saving
-        file = Path(self.save_folder, "individuals", f"{filename}.png")
+        file = Path(self.save_folder, f"{filename}.png")
         if save_image:
             file.parent.mkdir(parents=True, exist_ok=True)
             axis.figure.savefig(file, bbox_inches="tight", dpi=150)
@@ -193,7 +193,7 @@ class Visualization:
             for individual in species:
                 axis.scatter(random.uniform(min_pos, max_pos), random.uniform(min_pos, max_pos), color=color, marker=marker)
 
-        file = Path(self.save_folder, "populations", f"{filename}.png")
+        file = Path(self.save_folder, f"{filename}.png")
         if save_image:
             file.parent.mkdir(parents=True, exist_ok=True)
             plt.savefig(file, bbox_inches="tight", dpi=150)
@@ -251,10 +251,11 @@ class Visualization:
             raise ValueError("There are no individuals in the given population.")
 
         figure, axis = plt.subplots(1, 2, figsize=(12, 6))
-        self.visualize_population(population, axis[0], "", f"Generation {current_generation}: Population", False, False)
-        self.visualize_network(fittest, axis[1], "", f"Generation {current_generation}: Best individual with fitness {fittest.fitness_info}", False, False)
+        self.visualize_population(population, axis[0], "", f"Population of {sum([len(species) for species in population])} individuals divided into {len(population)} species", False, False)
+        self.visualize_network(fittest, axis[1], "", f"Best individual with fitness {fittest.fitness_info}", False, False)
+        plt.suptitle(f"Generation {current_generation}", fontweight='bold', fontsize=14)
 
-        file = Path(self.save_folder, "populations_with_best_individual", f"{filename}.png")
+        file = Path(self.save_folder, f"{filename}.png")
         if save_image:
             file.parent.mkdir(parents=True, exist_ok=True)
             plt.savefig(file, bbox_inches="tight", dpi=150)
