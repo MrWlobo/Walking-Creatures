@@ -14,6 +14,8 @@ def run_genetic_algorithm(params: GeneticAlgorithmParams):
 if __name__ == "__main__":
     params = GeneticAlgorithmParams(
         creature_path=Path("assets/creatures") / "6-revolute_biped.urdf",
+        surface_friction=0.7,
+        
         results_path=Path("results"),
         
         fitness=XDistanceStabilityFitness(stability_coefficient=0.001),

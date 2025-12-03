@@ -11,12 +11,13 @@ class Simulation:
     It is suited for simulating one creature at a time. The reset_state method should be called after each individual run.
     For parallel processing, separate Simulation instances should be used.
     """
-    def __init__(self, simulation_type: int, creature_path: Path, settle_steps: int = 120, time_step: float = 1./240.):
+    def __init__(self, simulation_type: int, creature_path: Path, surface_friction: float = 0.7, settle_steps: int = 120, time_step: float = 1./240.):
         """Initializes the Simulation class.
 
             :param int simulation_type: If the simulation should include a graphical representation (p.GUI)
                                             or not (p.DIRECT). Use p.DIRECT for performance.
             :param Path creature_path: A path to the .urdf creature file that should be used.
+            :param float surface_friction: Friction of the plane the creatures walk on.
             :param int, optional settle_steps: How many simulation steps to wait for the creature to reach a stable state.
                                             Probably not necessary to change the default. Defaults to 120.
             :param float, optional time_step: How much time should one tick represent (NOT how much real time should it take). Defaults to 1./240..
@@ -47,7 +48,7 @@ class Simulation:
         self.planeId = p.loadURDF("plane.urdf", physicsClientId=self.client_id)
 
         # set ground friction
-        p.changeDynamics(self.planeId, -1, lateralFriction=0.4, physicsClientId=self.client_id)
+        p.changeDynamics(self.planeId, -1, lateralFriction=surface_friction, physicsClientId=self.client_id)
         
         # load creature at origin (temp)
         start_orientation = p.getQuaternionFromEuler([0, 0, 0], physicsClientId=self.client_id)

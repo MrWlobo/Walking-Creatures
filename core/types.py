@@ -44,6 +44,7 @@ class GeneticAlgorithmParams:
         speciation_coefficients (tuple[float, float, float]): Weights for (excess, disjoint, weight differences)
                                                                 in compatibility calculation for speciation purposes.
         speciation_compatibility_distance (float): Threshold for determining whether two networks belong to the same species.
+        surface_friction (float): Friction of the surface the creatures walk on.
         n_processes (int): How many threads to use when running the population's simulations. 
                             Use None to let the functions use the maximum available number of threads.
         time_step (float): How much time should one tick of the simulation represent. Probably not necessary to change.
@@ -66,6 +67,7 @@ class GeneticAlgorithmParams:
     indiv_output_scale: float
     speciation_coefficients: tuple[float, float, float]
     speciation_compatibility_distance: float
+    surface_friction: float = 0.7
     n_processes: int = None
     time_step: float = 1./240.
     settle_steps: int = 120

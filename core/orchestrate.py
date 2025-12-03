@@ -97,6 +97,7 @@ def _init_process(sim_type, params: GeneticAlgorithmParams):
     _worker_sim = Simulation(
         simulation_type=sim_type,
         creature_path=params.creature_path,
+        surface_friction=params.surface_friction,
         settle_steps=params.settle_steps,
         time_step=params.time_step
     )

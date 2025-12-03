@@ -23,6 +23,6 @@ if __name__ == "__main__":
     
     indiv = deserialize_network(indiv_path)
     
-    sim = Simulation(p.GUI, params.creature_path, params.settle_steps, params.time_step)
+    sim = Simulation(p.GUI, params.creature_path, params.surface_friction, params.settle_steps, params.time_step)
     
     run_individual(indiv, sim, params)
