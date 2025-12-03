@@ -151,9 +151,6 @@ class GeneticAlgorithm:
         
         if self.creature_path.suffix != '.urdf':
             raise ValueError(f"Creature file must be a .urdf file. Got: {self.creature_path.suffix}")
-        
-        if not self.results_path.exists():
-            raise FileNotFoundError(f"The results base directory does not exist: {self.results_path}")
 
         if any(x is None for x in [p.fitness, p.selection, p.state_getter, p.run_conditions]):
             raise ValueError("fitness, selection, state_getter, and run_conditions must be initialized objects, not None.")
