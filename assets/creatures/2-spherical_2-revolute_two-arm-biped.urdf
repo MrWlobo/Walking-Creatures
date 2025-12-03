@@ -1,5 +1,4 @@
 <?xml version="1.0"?>
-
 <robot name="2-spherical_2-revolute_two-arm-biped">
   <link name="torso">
     <inertial>
@@ -46,12 +45,12 @@
       </geometry>
     </collision>
   </link>
+  
   <joint name="hip_left" type="revolute">
     <origin xyz="0 0.1 0" rpy="0 0 0" />
     <parent link="torso" />
     <child link="left_leg" />
-    <axis xyz="1 0 0" />
-    <limit effort="200" velocity="20" lower="-0.8" upper="0.8" />
+    <axis xyz="1 0 0" /> <limit effort="200" velocity="20" lower="-0.8" upper="0.8" />
     <dynamics damping="0.5" friction="0.2" />
   </joint>
 
@@ -75,12 +74,12 @@
       </geometry>
     </collision>
   </link>
+  
   <joint name="hip_right" type="revolute">
     <origin xyz="0 -0.1 0" rpy="0 0 0" />
     <parent link="torso" />
     <child link="right_leg" />
-    <axis xyz="1 0 0" />
-    <limit effort="200" velocity="20" lower="-0.8" upper="0.8" />
+    <axis xyz="1 0 0" /> <limit effort="200" velocity="20" lower="-0.8" upper="0.8" />
     <dynamics damping="0.5" friction="0.2" />
   </joint>
 
@@ -106,11 +105,12 @@
       </geometry>
     </collision>
   </link>
+  
   <joint name="shoulder_left" type="spherical">
     <origin xyz="0.1 0.25 0.1" rpy="0 0 0" />
     <parent link="torso" />
     <child link="left_arm" />
-    <limit effort="100" velocity="20" />
+    <axis xyz="1 0 0"/> <limit effort="100" velocity="20" />
     <dynamics damping="0.2" friction="0.1" />
   </joint>
 
@@ -134,11 +134,12 @@
       </geometry>
     </collision>
   </link>
+  
   <joint name="shoulder_right" type="spherical">
     <origin xyz="0.1 -0.25 0.1" rpy="0 0 0" />
     <parent link="torso" />
     <child link="right_arm" />
-    <limit effort="100" velocity="20" />
+    <axis xyz="1 0 0"/> <limit effort="100" velocity="20" />
     <dynamics damping="0.2" friction="0.1" />
   </joint>
 </robot>

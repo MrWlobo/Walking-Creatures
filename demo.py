@@ -10,13 +10,13 @@ from simulation.simulation import Simulation
 
 if __name__ == "__main__":
     # SETTINGS
-    RUN_NAME: str = "run_2025-12-02_14-48-50"
-    GENERATION: int = 36
+    RUN_NAME: str = "run_2025-12-02_23-28-58"
+    GENERATION: int = 50
     ###
     
     
     params_path = Path(__file__).parent / "results" / RUN_NAME / "params.pkl"
-    indiv_path = Path(__file__).parent / "results" / RUN_NAME / f"generation-{GENERATION}/best_individual.json"
+    indiv_path = Path(__file__).parent / "results" / RUN_NAME / f"generation-{GENERATION}/global_fittest_individual.json"
     
     with open(params_path, "rb") as f:
         params = pickle.load(f)

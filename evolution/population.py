@@ -59,49 +59,70 @@ def create_next_generation(population: list[list[NeuralNetwork]], new_species_si
     else:
         num_processes = params.n_processes
     
-    new_population = []
+    total_target_size = sum(new_species_sizes)
     
-    with multiprocessing.Pool(processes=num_processes) as pool:
+    # global elitism
+    all_individuals = [indiv for species in population for indiv in species]
+    
+    n_global_elites = int(np.ceil(params.succession_ratio * total_target_size))
+    n_global_elites = min(n_global_elites, total_target_size)
+    
+    elite_indivs = heapq.nlargest(n_global_elites, all_individuals, key=lambda i: i.fitness_info)
+    
+    new_population = [copy.deepcopy(i) for i in elite_indivs]
+    
+    # calculate number of remaining spots in the new population (after elitism)
+    remaining_spots = total_target_size - len(new_population)
+    
+    if remaining_spots > 0:
+        tasks = []
         
-        for species, new_size in zip(population, new_species_sizes):
-            if new_size <= 0:
-                continue
+        offspring_counts = []
+        total_planned_size = sum(new_species_sizes)
+        
+        if total_planned_size > 0:
+            floored_counts = [int(remaining_spots * (size / total_planned_size)) for size in new_species_sizes]
             
-            # elitism
-            n_successions = int(np.ceil(params.succession_ratio * new_size))
-            n_successions = min(n_successions, new_size)
+            remainder = remaining_spots - sum(floored_counts)
             
-            elite_indivs = heapq.nlargest(n_successions, species, key=lambda i: i.fitness_value)
-            new_species_pop = [copy.deepcopy(i) for i in elite_indivs]
+            if remainder > 0:
+                sorted_indices = np.argsort(new_species_sizes)[::-1]
+                for i in range(remainder):
+                    target_idx = sorted_indices[i % len(sorted_indices)]
+                    floored_counts[target_idx] += 1
             
-            if len(new_species_pop) > new_size:
-                new_species_pop = new_species_pop[:new_size]
+            offspring_counts = floored_counts
+        else:
+            # edge case: if desired size is equal to 0
+            offspring_counts = [0] * len(new_species_sizes)
+
+        with multiprocessing.Pool(processes=num_processes) as pool:
+            for species, count in zip(population, offspring_counts):
+                if count <= 0 or len(species) == 0:
+                    continue
                 
-            remaining_spots = new_size - len(new_species_pop)
-            
-            if remaining_spots > 0:
-                tasks = []
                 
-                base_chunk = remaining_spots // num_processes
-                remainder = remaining_spots % num_processes
+                base_chunk = count // num_processes
+                remainder_chunk = count % num_processes
                 
-                for i in range(num_processes):
-                    count = base_chunk + (1 if i < remainder else 0)
-                    
-                    if count > 0:
-                        tasks.append((species, count, params))
-                
-                if tasks:
-                    results = pool.map(_generate_offspring_batch, tasks)
-                    for batch in results:
-                        new_species_pop.extend(batch)
-            
-            new_population.extend(new_species_pop)
+                # for small species using multiple threads is unnecessary
+                if count < num_processes:
+                    tasks.append((species, count, params))
+                else:
+                    for i in range(num_processes):
+                        chunk = base_chunk + (1 if i < remainder_chunk else 0)
+                        if chunk > 0:
+                            tasks.append((species, chunk, params))
+
+            # offspring generation
+            if tasks:
+                results = pool.map(_generate_offspring_batch, tasks)
+                for batch in results:
+                    new_population.extend(batch)
 
     # final check
-    target_size = sum(new_species_sizes)
-    if len(new_population) != target_size:
-        raise RuntimeError(f"Generated {len(new_population)}, expected {target_size}")
+    if len(new_population) != total_target_size:
+        raise RuntimeError(f"Generated {len(new_population)}, expected {total_target_size}")
         
     return new_population
 

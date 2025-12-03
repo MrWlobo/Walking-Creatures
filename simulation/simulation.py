@@ -282,13 +282,16 @@ class Simulation:
             )
     
     
-    def reset_state(self):
+    def reset_state(self, seed: int = 42):
         """Resets the simulation to the saved 'settled' start state.
-        Call this after having finished the simulation for a single individual."""
+        Call this after having finished the simulation for a single individual.
+        
+        :param int seed: Seed for the jitter, should be the same for the same individual.
+        """
         p.restoreState(self.startStateId, physicsClientId=self.client_id)
         self.tick_count = 0
 
-        self._apply_jitter(0.1)
+        self._apply_jitter(0.1, seed=seed)
 
 
     def terminate(self):
@@ -325,15 +328,18 @@ class Simulation:
         return False
     
 
-    def _apply_jitter(self, intensity: float = 0.1):
+    def _apply_jitter(self, intensity: float = 0.1, seed: int = 42):
         """
         Applies a small random perturbation to all joint positions to break 
         symmetry and zero-state equilibrium.
         
         :param float intensity: The magnitude of the jitter in radians.
+        :param int seed: Seed for the jitter, should be the same for the same individual.
         """
+        rng = np.random.RandomState(seed)
+
         if self.num_revolute > 0:
-            revolute_jitter = np.random.uniform(-intensity, intensity, size=self.num_revolute)
+            revolute_jitter = rng.uniform(-intensity, intensity, size=self.num_revolute)
             
             for i, j_id in enumerate(self.revolute_joints):
                 p.resetJointState(
@@ -345,9 +351,9 @@ class Simulation:
                 )
 
         for j_id in self.spherical_joints:
-            roll = np.random.uniform(-intensity, intensity)
-            pitch = np.random.uniform(-intensity, intensity)
-            yaw = np.random.uniform(-intensity, intensity)
+            roll = rng.uniform(-intensity, intensity)
+            pitch = rng.uniform(-intensity, intensity)
+            yaw = rng.uniform(-intensity, intensity)
             
             start_quat = p.getQuaternionFromEuler([roll, pitch, yaw])
             
