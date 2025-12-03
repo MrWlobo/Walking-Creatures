@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <robot name="4-spherical_4-revolute_spider-bot">
+  
   <link name="body_core">
     <inertial>
       <origin xyz="0 0 0"/>
@@ -35,24 +36,21 @@
     </inertial>
     <visual>
       <origin xyz="0 0 -0.1" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="0.2" radius="0.03"/>
-      </geometry>
+      <geometry><cylinder length="0.2" radius="0.03"/></geometry>
       <material name="leg_material"/>
     </visual>
     <collision>
       <origin xyz="0 0 -0.1" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="0.2" radius="0.03"/>
-      </geometry>
+      <geometry><cylinder length="0.2" radius="0.03"/></geometry>
     </collision>
   </link>
+
   <joint name="hip_fl" type="spherical">
-    <dynamics damping="0.5" friction="0.1"/>
+    <dynamics damping="2.0" friction="1.0"/>
     <origin xyz="0.2 0.2 0" rpy="0 0 0"/>
     <parent link="body_core"/>
     <child link="hip_fl_link"/>
-    <limit effort="150" velocity="20"/>
+    <limit effort="50" velocity="5.0"/>
   </joint>
 
   <link name="knee_fl_link">
@@ -63,25 +61,22 @@
     </inertial>
     <visual>
       <origin xyz="0 0 -0.1" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="0.2" radius="0.03"/>
-      </geometry>
+      <geometry><cylinder length="0.2" radius="0.03"/></geometry>
       <material name="leg_material"/>
     </visual>
     <collision>
       <origin xyz="0 0 -0.1" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="0.2" radius="0.03"/>
-      </geometry>
+      <geometry><cylinder length="0.2" radius="0.03"/></geometry>
     </collision>
   </link>
+
   <joint name="knee_fl" type="revolute">
-    <dynamics damping="0.5" friction="0.1"/>
+    <dynamics damping="2.0" friction="1.0"/>
     <origin xyz="0.0 0.0 -0.2" rpy="0 0 0"/>
     <parent link="hip_fl_link"/>
     <child link="knee_fl_link"/>
     <axis xyz="1 0 0"/>
-    <limit effort="150" velocity="20" lower="-0.1" upper="2.5"/>
+    <limit effort="40" velocity="5.0" lower="-0.1" upper="2.5"/>
   </joint>
 
   <link name="hip_fr_link">
@@ -92,24 +87,21 @@
     </inertial>
     <visual>
       <origin xyz="0 0 -0.1" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="0.2" radius="0.03"/>
-      </geometry>
+      <geometry><cylinder length="0.2" radius="0.03"/></geometry>
       <material name="leg_material"/>
     </visual>
     <collision>
       <origin xyz="0 0 -0.1" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="0.2" radius="0.03"/>
-      </geometry>
+      <geometry><cylinder length="0.2" radius="0.03"/></geometry>
     </collision>
   </link>
+
   <joint name="hip_fr" type="spherical">
-    <dynamics damping="0.5" friction="0.1"/>
+    <dynamics damping="2.0" friction="1.0"/>
     <origin xyz="0.2 -0.2 0" rpy="0 0 0"/>
     <parent link="body_core"/>
     <child link="hip_fr_link"/>
-    <limit effort="150" velocity="20"/>
+    <limit effort="50" velocity="5.0"/>
   </joint>
 
   <link name="knee_fr_link">
@@ -120,25 +112,22 @@
     </inertial>
     <visual>
       <origin xyz="0 0 -0.1" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="0.2" radius="0.03"/>
-      </geometry>
+      <geometry><cylinder length="0.2" radius="0.03"/></geometry>
       <material name="leg_material"/>
     </visual>
     <collision>
       <origin xyz="0 0 -0.1" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="0.2" radius="0.03"/>
-      </geometry>
+      <geometry><cylinder length="0.2" radius="0.03"/></geometry>
     </collision>
   </link>
+
   <joint name="knee_fr" type="revolute">
-    <dynamics damping="0.5" friction="0.1"/>
+    <dynamics damping="2.0" friction="1.0"/>
     <origin xyz="0.0 0.0 -0.2" rpy="0 0 0"/>
     <parent link="hip_fr_link"/>
     <child link="knee_fr_link"/>
     <axis xyz="1 0 0"/>
-    <limit effort="150" velocity="20" lower="-0.1" upper="2.5"/>
+    <limit effort="40" velocity="5.0" lower="-0.1" upper="2.5"/>
   </joint>
 
   <link name="hip_bl_link">
@@ -149,24 +138,21 @@
     </inertial>
     <visual>
       <origin xyz="0 0 -0.1" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="0.2" radius="0.03"/>
-      </geometry>
+      <geometry><cylinder length="0.2" radius="0.03"/></geometry>
       <material name="leg_material"/>
     </visual>
     <collision>
       <origin xyz="0 0 -0.1" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="0.2" radius="0.03"/>
-      </geometry>
+      <geometry><cylinder length="0.2" radius="0.03"/></geometry>
     </collision>
   </link>
+
   <joint name="hip_bl" type="spherical">
-    <dynamics damping="0.5" friction="0.1"/>
+    <dynamics damping="2.0" friction="1.0"/>
     <origin xyz="-0.2 0.2 0" rpy="0 0 0"/>
     <parent link="body_core"/>
     <child link="hip_bl_link"/>
-    <limit effort="150" velocity="20"/>
+    <limit effort="50" velocity="5.0"/>
   </joint>
 
   <link name="knee_bl_link">
@@ -177,25 +163,22 @@
     </inertial>
     <visual>
       <origin xyz="0 0 -0.1" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="0.2" radius="0.03"/>
-      </geometry>
+      <geometry><cylinder length="0.2" radius="0.03"/></geometry>
       <material name="leg_material"/>
     </visual>
     <collision>
       <origin xyz="0 0 -0.1" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="0.2" radius="0.03"/>
-      </geometry>
+      <geometry><cylinder length="0.2" radius="0.03"/></geometry>
     </collision>
   </link>
+
   <joint name="knee_bl" type="revolute">
-    <dynamics damping="0.5" friction="0.1"/>
+    <dynamics damping="2.0" friction="1.0"/>
     <origin xyz="0.0 0.0 -0.2" rpy="0 0 0"/>
     <parent link="hip_bl_link"/>
     <child link="knee_bl_link"/>
     <axis xyz="1 0 0"/>
-    <limit effort="150" velocity="20" lower="-0.1" upper="2.5"/>
+    <limit effort="40" velocity="5.0" lower="-0.1" upper="2.5"/>
   </joint>
 
   <link name="hip_br_link">
@@ -206,24 +189,21 @@
     </inertial>
     <visual>
       <origin xyz="0 0 -0.1" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="0.2" radius="0.03"/>
-      </geometry>
+      <geometry><cylinder length="0.2" radius="0.03"/></geometry>
       <material name="leg_material"/>
     </visual>
     <collision>
       <origin xyz="0 0 -0.1" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="0.2" radius="0.03"/>
-      </geometry>
+      <geometry><cylinder length="0.2" radius="0.03"/></geometry>
     </collision>
   </link>
+
   <joint name="hip_br" type="spherical">
-    <dynamics damping="0.5" friction="0.1"/>
+    <dynamics damping="2.0" friction="1.0"/>
     <origin xyz="-0.2 -0.2 0" rpy="0 0 0"/>
     <parent link="body_core"/>
     <child link="hip_br_link"/>
-    <limit effort="150" velocity="20"/>
+    <limit effort="50" velocity="5.0"/>
   </joint>
 
   <link name="knee_br_link">
@@ -234,24 +214,22 @@
     </inertial>
     <visual>
       <origin xyz="0 0 -0.1" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="0.2" radius="0.03"/>
-      </geometry>
+      <geometry><cylinder length="0.2" radius="0.03"/></geometry>
       <material name="leg_material"/>
     </visual>
     <collision>
       <origin xyz="0 0 -0.1" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="0.2" radius="0.03"/>
-      </geometry>
+      <geometry><cylinder length="0.2" radius="0.03"/></geometry>
     </collision>
   </link>
+
   <joint name="knee_br" type="revolute">
-    <dynamics damping="0.5" friction="0.1"/>
+    <dynamics damping="2.0" friction="1.0"/>
     <origin xyz="0.0 0.0 -0.2" rpy="0 0 0"/>
     <parent link="hip_br_link"/>
     <child link="knee_br_link"/>
     <axis xyz="1 0 0"/>
-    <limit effort="150" velocity="20" lower="-0.1" upper="2.5"/>
+    <limit effort="40" velocity="5.0" lower="-0.1" upper="2.5"/>
   </joint>
+
 </robot>

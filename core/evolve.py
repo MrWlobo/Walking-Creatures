@@ -151,6 +151,9 @@ class GeneticAlgorithm:
         
         if self.creature_path.suffix != '.urdf':
             raise ValueError(f"Creature file must be a .urdf file. Got: {self.creature_path.suffix}")
+        
+        if p.surface_friction < 0 or p.surface_friction > 1.5:
+            raise ValueError(f"Surface friction must be in the range (0, 1.5). Got: {p.surface_friction}")
 
         if any(x is None for x in [p.fitness, p.selection, p.state_getter, p.run_conditions]):
             raise ValueError("fitness, selection, state_getter, and run_conditions must be initialized objects, not None.")
@@ -178,6 +181,12 @@ class GeneticAlgorithm:
         
         if not math.isclose(sum(p.mutation_type_percentages), 100.0, rel_tol=1e-5):
             raise ValueError(f"mutation_type_percentages must sum to 100. Got sum: {sum(p.mutation_type_percentages)}")
+        
+        if len(p.weight_mutation_params) != 5:
+            raise ValueError("weight_mutation_params must have exactly 5 values.")
+        
+        if p.weight_mutation_params[0] < 0 or p.weight_mutation_params[0] > 1:
+            raise ValueError("weight_mutation_params[0] must represent a valid probability value")
 
         if len(p.speciation_coefficients) != 3:
             raise ValueError("speciation_coefficients must have exactly 3 values.")
