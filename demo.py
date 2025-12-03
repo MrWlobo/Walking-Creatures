@@ -10,8 +10,8 @@ from simulation.simulation import Simulation
 
 if __name__ == "__main__":
     # SETTINGS
-    RUN_NAME: str = "run_2025-12-01_18-45-28"
-    GENERATION: int = 99
+    RUN_NAME: str = "run_2025-12-02_14-48-50"
+    GENERATION: int = 36
     ###
     
     

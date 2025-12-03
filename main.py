@@ -21,7 +21,7 @@ if __name__ == "__main__":
         state_getter=FullJointStateGetter(),
         run_conditions=FallOrTimeoutRunConditions(max_time_seconds=10, height_threshold=0.3),
         
-        population_size=5_000,
+        population_size=1_000,
         n_generations=300,
         
         initial_connections=2,
@@ -32,7 +32,7 @@ if __name__ == "__main__":
         
         indiv_output_scale=0.05,
         
-        speciation_coefficients=(1.6, 1.2, 0.4),
+        speciation_coefficients=(4.6, 1.2, 0.4),
         speciation_compatibility_distance=1.5,
         
         n_processes=None

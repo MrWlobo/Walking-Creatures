@@ -4,6 +4,8 @@ from typing import Callable
 from collections import defaultdict, deque
 import numpy as np
 
+def relu(x):
+    return x if x > 0 else 0
 
 class NeuralNetwork:
     """
@@ -17,7 +19,7 @@ class NeuralNetwork:
     connection_split_table = {} # connection: id of node that splits the connection
 
 
-    def __init__(self, input_units: int = None, units_1d: int = None, units_3d: int = None, beginning_connections: int = 2, activation_function: Callable = math.tanh, nodes: dict[int, str] = None, connections: dict[tuple[int, int], dict[str, float | bool]] = None):
+    def __init__(self, input_units: int = None, units_1d: int = None, units_3d: int = None, beginning_connections: int = 2, output_activation_function: Callable = math.tanh, hidden_activation_function: Callable = relu,  nodes: dict[int, str] = None, connections: dict[tuple[int, int], dict[str, float | bool]] = None):
         """
         Initialize a NEAT-style neural network with input and output units.
 
@@ -30,7 +32,8 @@ class NeuralNetwork:
             units_1d (int, optional): Number of 1D output units.
             units_3d (int, optional): Number of 3D output units (each counts as 3 neurons).
             beginning_connections (int, optional): Number of random connections to create initially if nodes/connections are not provided. Default is 2.
-            activation_function (Callable, optional): Activation function applied to hidden/output nodes. Default is math.tanh.
+            output_activation_function (Callable, optional): Activation function applied to output nodes. Default is math.tanh.
+            hidden_activation_function (Callable, optional) : Activation used for hidden nodes.
             nodes (dict[int, str], optional): Existing nodes to initialize the network. Keys are node IDs, values are types ("input", "hidden", "output").
             connections (dict[tuple[int, int], dict[str, float | bool]], optional): Existing connections to initialize the network. Keys are (source, target) tuples.
         """
@@ -42,7 +45,8 @@ class NeuralNetwork:
             self.output_units = len([n for n, t in nodes.items() if t == "output"])
             self.nodes = nodes
             self.connections = connections
-            self.activation_function = activation_function
+            self.output_activation_function = output_activation_function
+            self.hidden_activation_function = hidden_activation_function
             self.fitness_value = None
             self.fitness_info = None
         else:
@@ -50,7 +54,8 @@ class NeuralNetwork:
             self.output_units = units_1d + 3 * units_3d
             self.nodes = {**{k: "input" for k in range(self.input_units)}, **{k: "output" for k in range(self.input_units, self.output_units + self.input_units)}}
             self.connections = {}
-            self.activation_function = activation_function
+            self.output_activation_function = output_activation_function
+            self.hidden_activation_function = hidden_activation_function
             self.fitness_value = None
             self.fitness_info = None
 
@@ -190,7 +195,7 @@ class NeuralNetwork:
             else:
                 total = 0.0
 
-            node_values[node] = self.activation_function(total)
+            node_values[node] = self.hidden_activation_function(total) if self.nodes[node] == "hidden" else self.output_activation_function(total)
 
         # Collect outputs
         output_nodes = [n for n, t in self.nodes.items() if t == "output"]
