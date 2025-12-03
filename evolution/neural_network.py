@@ -224,8 +224,9 @@ class NeuralNetwork:
 
 
     def __repr__(self):
-        result = ""
-        for key in self.connections:
-            result += f"{key}: {self.connections[key]}\n"
-
-        return result
+        result = []
+        for key in sorted(self.connections.keys()):
+            val = self.connections[key]
+            result.append(f"{key}: {val}") 
+        
+        return "\n".join(result)

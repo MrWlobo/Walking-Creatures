@@ -351,9 +351,9 @@ class Simulation:
                 )
 
         for j_id in self.spherical_joints:
-            roll = np.random.uniform(-intensity, intensity)
-            pitch = np.random.uniform(-intensity, intensity)
-            yaw = np.random.uniform(-intensity, intensity)
+            roll = rng.uniform(-intensity, intensity)
+            pitch = rng.uniform(-intensity, intensity)
+            yaw = rng.uniform(-intensity, intensity)
             
             start_quat = p.getQuaternionFromEuler([roll, pitch, yaw])
             
