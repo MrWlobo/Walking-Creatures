@@ -16,7 +16,7 @@ if __name__ == "__main__":
         creature_path=Path("assets/creatures") / "6-revolute_biped.urdf",
         results_path=Path("results"),
         
-        fitness=XDistanceStabilityFitness(stability_coefficient=0.01),
+        fitness=XDistanceStabilityFitness(stability_coefficient=0.001),
         selection=TournamentSelection(tournament_size=10),
         state_getter=FullJointStateGetter(),
         run_conditions=FallOrTimeoutRunConditions(max_time_seconds=10, height_threshold=0.2),
@@ -27,8 +27,8 @@ if __name__ == "__main__":
         initial_connections=4,
         
         succession_ratio=0.005,
-        genetic_operation_ratios=(0.0, 1.0),
-        mutation_type_percentages=[100, 0, 0],
+        genetic_operation_ratios=(0.7, 0.3),
+        mutation_type_percentages=[60, 37.5, 2.5],
         weight_mutation_params=(0.01, -2.2, 2.2, -10.0, 10.0),
         
         indiv_output_scale=7.0,
