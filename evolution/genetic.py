@@ -37,7 +37,7 @@ def crossover(parent1: NeuralNetwork, parent2: NeuralNetwork) -> NeuralNetwork:
     return child
 
 
-def mutate(probabilities: list[int], individual: NeuralNetwork) -> None:
+def mutate(probabilities: list[int], individual: NeuralNetwork, weight_mutation_params: tuple[float, float, float, float, float] = (0.8, -2.2, 2.2, -10.0, 10.0)) -> NeuralNetwork:
     """
     Perform a mutation on an individual neural network based on given probabilities.
 
@@ -45,7 +45,19 @@ def mutate(probabilities: list[int], individual: NeuralNetwork) -> None:
         probabilities (list[int]): List of 3 integers representing percent chance for:
             [0] mutate weight, [1] mutate connection, [2] mutate node.
             Must sum to 100.
+
         individual (NeuralNetwork): The neural network to mutate.
+
+        weight_mutation_params (tuple[float, float, float, float, float], optional):
+            Parameters controlling weight mutation:
+            (
+                perturbation_chance,  # Probability of perturbing vs replacing a weight
+                perturbation_min,     # Minimum additive perturbation
+                perturbation_max,     # Maximum additive perturbation
+                change_min,           # Minimum value for full weight replacement
+                change_max            # Maximum value for full weight replacement
+            )
+            Defaults to (0.8, -2.2, 2.2, -10.0, 10.0).
     """
 
     if len(probabilities) != 3:
@@ -58,7 +70,7 @@ def mutate(probabilities: list[int], individual: NeuralNetwork) -> None:
 
     if selected <= probabilities[0]:
         connection = random.choice(list(individual.connections.keys()))
-        _mutate_weight(connection, individual)
+        _mutate_weight(connection, individual, weight_mutation_params)
 
     elif selected <= (probabilities[0] + probabilities[1]):
         success = False
@@ -78,22 +90,41 @@ def mutate(probabilities: list[int], individual: NeuralNetwork) -> None:
     return individual
 
 
-def _mutate_weight(connection: tuple[int, int], individual: NeuralNetwork) -> None:
+def _mutate_weight(connection: tuple[int, int], individual: NeuralNetwork, weight_mutation_params: tuple[float, float, float, float, float]) -> None:
     """
     Mutate the weight of a given connection in a neural network.
 
     Args:
         connection (tuple[int, int]): The (source, target) node indices of the connection.
+
         individual (NeuralNetwork): Neural network to mutate.
 
-    Behavior:
-        - 90% chance: small perturbation [-0.1, 0.1] added to weight
-        - 10% chance: assign completely new random weight in [-1.0, 1.0]
+        weight_mutation_params (tuple[float, float, float, float, float], optional):
+            Parameters controlling weight mutation:
+            (
+                perturbation_chance,  # Probability of perturbing vs replacing a weight
+                perturbation_min,     # Minimum additive perturbation
+                perturbation_max,     # Maximum additive perturbation
+                change_min,           # Minimum value for full weight replacement
+                change_max            # Maximum value for full weight replacement
+            )
     """
-    if random.random() < 0.9:
-        individual.connections[connection]["weight"] += random.uniform(-0.1, 0.1)
+
+    perturbation_chance, perturbation_min, perturbation_max, change_min, change_max = weight_mutation_params
+
+    if perturbation_chance < 0 or perturbation_chance > 1:
+        raise ValueError("Perturbation chance (weight_mutation_params[0]) should have a value between 0 and 1.")
+
+    if perturbation_min > perturbation_max:
+        raise ValueError("Minimum perturbation value (weight_mutation_params[1]) cannot be bigger than maximum perturbation value (weight_mutation_params[2]).")
+
+    if change_min > change_max:
+        raise ValueError("Minimum change value (weight_mutation_params[3]) cannot be bigger than maximum change value (weight_mutation_params[4]).")
+
+    if random.random() < perturbation_chance:
+        individual.connections[connection]["weight"] += random.uniform(perturbation_min, perturbation_max)
     else:
-        individual.connections[connection]["weight"] = random.uniform(-1.0, 1.0)
+        individual.connections[connection]["weight"] = random.uniform(change_min, change_max)
 
 
 def _mutate_connection(connection: tuple[int, int], individual: NeuralNetwork) -> bool:

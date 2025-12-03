@@ -63,7 +63,7 @@ class NeuralNetwork:
                 connection = (random.randint(0, self.input_units - 1), random.randint(self.input_units, self.input_units + self.output_units - 1))
                 while connection in self.connections:
                     connection = (random.randint(0, self.input_units - 1), random.randint(self.input_units, self.input_units + self.output_units - 1))
-                self.connections[connection] = {"weight": random.uniform(-1,1), "enabled": True}
+                self.connections[connection] = {"weight": random.uniform(-10,10), "enabled": True}
 
 
     def change_weight(self, connection: tuple[int, int], new_weight: float) -> None:

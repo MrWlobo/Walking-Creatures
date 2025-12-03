@@ -31,6 +31,14 @@ class GeneticAlgorithmParams:
                                                                 operations, respectively.
         mutation_type_percentages (list[float]): List of 3 integers representing percent chance for 
                                                     [0] mutate weight, [1] mutate connection, [2] mutate node. Must sum to 100.
+        weight_mutation_params (tuple[float, float, float, float, float]) Parameters controlling weight mutation:
+            (
+                [0] Probability of perturbing vs replacing a weight
+                [1] Minimum additive perturbation
+                [2] Maximum additive perturbation
+                [3] Minimum value for full weight replacement
+                [4] Maximum value for full weight replacement
+            )
         indiv_output_scale (float): Value to multiply NN outputs by before passing them to joint control functions.
                                     Used to match the appropriate order of magnitude of forces for the particular creature.
         speciation_coefficients (tuple[float, float, float]): Weights for (excess, disjoint, weight differences)
@@ -54,6 +62,7 @@ class GeneticAlgorithmParams:
     succession_ratio: float
     genetic_operation_ratios: tuple[float, float]
     mutation_type_percentages: list[float]
+    weight_mutation_params: tuple[float, float, float, float, float]
     indiv_output_scale: float
     speciation_coefficients: tuple[float, float, float]
     speciation_compatibility_distance: float

@@ -161,7 +161,7 @@ def _generate_offspring_batch(args):
             else:
                 # mutate otherwise
                 indiv = params.selection.select(species)
-                offspring = mutate(params.mutation_type_percentages, copy.deepcopy(indiv))
+                offspring = mutate(params.mutation_type_percentages, copy.deepcopy(indiv), params.weight_mutation_params)
         
         if not isinstance(offspring, NeuralNetwork):
             raise RuntimeError(f"Worker generated {type(offspring)} instead of NeuralNetwork")
