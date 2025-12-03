@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <robot name="4-spherical_quadruped">
+
   <link name="body">
     <inertial>
       <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -47,6 +48,13 @@
       </geometry>
       <material name="leg_yellow"/>
     </visual>
+    
+    <collision>
+      <origin xyz="0 0 -0.12" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length="0.24" radius="0.02"/>
+      </geometry>
+    </collision>
     <collision>
       <origin xyz="0 0 -0.24" rpy="0 0 0"/>
       <geometry>
@@ -59,8 +67,9 @@
     <origin xyz="0.2 0.2 0" rpy="0 0 0"/>
     <parent link="body"/>
     <child link="leg_fl"/>
-    <axis xyz="1 0 0"/> <limit effort="150" velocity="20"/>
-    <dynamics damping="0.5" friction="0.2"/>
+    <axis xyz="0 0 0"/> 
+    <limit effort="60" velocity="6.0"/>
+    <dynamics damping="1.0" friction="0.2"/>
   </joint>
 
   <link name="leg_fr">
@@ -80,6 +89,10 @@
       <material name="leg_yellow"/>
     </visual>
     <collision>
+      <origin xyz="0 0 -0.12" rpy="0 0 0"/>
+      <geometry><cylinder length="0.24" radius="0.02"/></geometry>
+    </collision>
+    <collision>
       <origin xyz="0 0 -0.24" rpy="0 0 0"/>
       <geometry><cylinder length="0.02" radius="0.1"/></geometry>
     </collision>
@@ -89,8 +102,9 @@
     <origin xyz="0.2 -0.2 0" rpy="0 0 0"/>
     <parent link="body"/>
     <child link="leg_fr"/>
-    <axis xyz="1 0 0"/> <limit effort="150" velocity="20"/>
-    <dynamics damping="0.5" friction="0.2"/>
+    <axis xyz="0 0 0"/> 
+    <limit effort="60" velocity="6.0"/>
+    <dynamics damping="1.0" friction="0.2"/>
   </joint>
 
   <link name="leg_bl">
@@ -110,6 +124,10 @@
       <material name="leg_yellow"/>
     </visual>
     <collision>
+      <origin xyz="0 0 -0.12" rpy="0 0 0"/>
+      <geometry><cylinder length="0.24" radius="0.02"/></geometry>
+    </collision>
+    <collision>
       <origin xyz="0 0 -0.24" rpy="0 0 0"/>
       <geometry><cylinder length="0.02" radius="0.1"/></geometry>
     </collision>
@@ -119,8 +137,9 @@
     <origin xyz="-0.2 0.2 0" rpy="0 0 0"/>
     <parent link="body"/>
     <child link="leg_bl"/>
-    <axis xyz="1 0 0"/> <limit effort="150" velocity="20"/>
-    <dynamics damping="0.5" friction="0.2"/>
+    <axis xyz="0 0 0"/> 
+    <limit effort="60" velocity="6.0"/>
+    <dynamics damping="1.0" friction="0.2"/>
   </joint>
 
   <link name="leg_br">
@@ -140,6 +159,10 @@
       <material name="leg_yellow"/>
     </visual>
     <collision>
+      <origin xyz="0 0 -0.12" rpy="0 0 0"/>
+      <geometry><cylinder length="0.24" radius="0.02"/></geometry>
+    </collision>
+    <collision>
       <origin xyz="0 0 -0.24" rpy="0 0 0"/>
       <geometry><cylinder length="0.02" radius="0.1"/></geometry>
     </collision>
@@ -149,8 +172,9 @@
     <origin xyz="-0.2 -0.2 0" rpy="0 0 0"/>
     <parent link="body"/>
     <child link="leg_br"/>
-    <axis xyz="1 0 0"/> <limit effort="150" velocity="20"/>
-    <dynamics damping="0.5" friction="0.2"/>
+    <axis xyz="0 0 0"/> 
+    <limit effort="60" velocity="6.0"/>
+    <dynamics damping="1.0" friction="0.2"/>
   </joint>
 
 </robot>

@@ -1,28 +1,19 @@
 <?xml version="1.0"?>
 <robot name="6-revolute_biped">
 
-  <material name="blue">
-    <color rgba="0.0 0.0 0.8 1.0"/>
-  </material>
-  <material name="grey">
-    <color rgba="0.5 0.5 0.5 1.0"/>
-  </material>
-  <material name="dark_grey">
-    <color rgba="0.3 0.3 0.3 1.0"/>
-  </material>
+  <material name="blue"><color rgba="0.0 0.0 0.8 1.0"/></material>
+  <material name="grey"><color rgba="0.5 0.5 0.5 1.0"/></material>
+  <material name="dark_grey"><color rgba="0.3 0.3 0.3 1.0"/></material>
 
   <link name="torso">
     <visual>
       <origin xyz="0 0 0.25" rpy="0 0 0"/>
-      <geometry>
-        <box size="0.2 0.15 0.5"/> </geometry>
+      <geometry><box size="0.2 0.15 0.5"/></geometry>
       <material name="blue"/>
     </visual>
     <collision>
       <origin xyz="0 0 0.25" rpy="0 0 0"/>
-      <geometry>
-        <box size="0.2 0.15 0.5"/>
-      </geometry>
+      <geometry><box size="0.2 0.15 0.5"/></geometry>
     </collision>
     <inertial>
       <mass value="5.0"/>
@@ -35,23 +26,19 @@
     <child link="left_thigh"/>
     <origin xyz="0 0.075 0" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
-    <limit effort="200" velocity="20" lower="-0.8" upper="0.8"/>
-    <dynamics damping="0.5" friction="0.1"/>
+    <limit effort="150" velocity="6.0" lower="-0.8" upper="0.8"/>
+    <dynamics damping="3.0" friction="0.5"/>
   </joint>
 
   <link name="left_thigh">
     <visual>
       <origin xyz="0 0 -0.2" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="0.4" radius="0.04"/>
-      </geometry>
+      <geometry><cylinder length="0.4" radius="0.04"/></geometry>
       <material name="grey"/>
     </visual>
     <collision>
       <origin xyz="0 0 -0.2" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="0.4" radius="0.04"/>
-      </geometry>
+      <geometry><cylinder length="0.4" radius="0.04"/></geometry>
     </collision>
     <inertial>
       <mass value="1.0"/>
@@ -64,23 +51,19 @@
     <child link="left_shin"/>
     <origin xyz="0 0 -0.4" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
-    <limit effort="200" velocity="20" lower="0.0" upper="2.5"/>
-    <dynamics damping="0.5" friction="0.1"/>
+    <limit effort="100" velocity="6.0" lower="0.0" upper="2.5"/>
+    <dynamics damping="3.0" friction="0.5"/>
   </joint>
 
   <link name="left_shin">
     <visual>
       <origin xyz="0 0 -0.15" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="0.3" radius="0.03"/>
-      </geometry>
+      <geometry><cylinder length="0.3" radius="0.03"/></geometry>
       <material name="grey"/>
     </visual>
     <collision>
       <origin xyz="0 0 -0.15" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="0.3" radius="0.03"/>
-      </geometry>
+      <geometry><cylinder length="0.3" radius="0.03"/></geometry>
     </collision>
     <inertial>
       <mass value="1.0"/>
@@ -93,22 +76,19 @@
     <child link="left_foot"/>
     <origin xyz="0 0 -0.3" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
-    <limit effort="100" velocity="20" lower="-0.4" upper="0.4"/>
-    <dynamics damping="0.5" friction="0.1"/>
+    <limit effort="40" velocity="4.0" lower="-0.4" upper="0.4"/>
+    <dynamics damping="1.5" friction="0.2"/>
   </joint>
 
   <link name="left_foot">
     <visual>
       <origin xyz="0.05 0 -0.015" rpy="0 0 0"/>
-      <geometry>
-        <box size="0.15 0.08 0.03"/> </geometry>
+      <geometry><box size="0.15 0.08 0.03"/></geometry>
       <material name="dark_grey"/>
     </visual>
     <collision>
       <origin xyz="0.05 0 -0.015" rpy="0 0 0"/>
-      <geometry>
-        <box size="0.15 0.08 0.03"/>
-      </geometry>
+      <geometry><box size="0.15 0.08 0.03"/></geometry>
     </collision>
     <inertial>
       <mass value="0.5"/>
@@ -116,29 +96,24 @@
     </inertial>
   </link>
 
-
   <joint name="right_hip" type="revolute">
     <parent link="torso"/>
     <child link="right_thigh"/>
     <origin xyz="0 -0.075 0" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
-    <limit effort="200" velocity="20" lower="-0.8" upper="0.8"/>
-    <dynamics damping="0.5" friction="0.1"/>
+    <limit effort="150" velocity="6.0" lower="-0.8" upper="0.8"/>
+    <dynamics damping="3.0" friction="0.5"/>
   </joint>
 
   <link name="right_thigh">
     <visual>
       <origin xyz="0 0 -0.2" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="0.4" radius="0.04"/>
-      </geometry>
+      <geometry><cylinder length="0.4" radius="0.04"/></geometry>
       <material name="grey"/>
     </visual>
     <collision>
       <origin xyz="0 0 -0.2" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="0.4" radius="0.04"/>
-      </geometry>
+      <geometry><cylinder length="0.4" radius="0.04"/></geometry>
     </collision>
     <inertial>
       <mass value="1.0"/>
@@ -151,23 +126,19 @@
     <child link="right_shin"/>
     <origin xyz="0 0 -0.4" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
-    <limit effort="200" velocity="20" lower="0.0" upper="2.5"/>
-    <dynamics damping="0.5" friction="0.1"/>
+    <limit effort="100" velocity="6.0" lower="0.0" upper="2.5"/>
+    <dynamics damping="3.0" friction="0.5"/>
   </joint>
 
   <link name="right_shin">
     <visual>
       <origin xyz="0 0 -0.15" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="0.3" radius="0.03"/>
-      </geometry>
+      <geometry><cylinder length="0.3" radius="0.03"/></geometry>
       <material name="grey"/>
     </visual>
     <collision>
       <origin xyz="0 0 -0.15" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="0.3" radius="0.03"/>
-      </geometry>
+      <geometry><cylinder length="0.3" radius="0.03"/></geometry>
     </collision>
     <inertial>
       <mass value="1.0"/>
@@ -180,23 +151,19 @@
     <child link="right_foot"/>
     <origin xyz="0 0 -0.3" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
-    <limit effort="100" velocity="20" lower="-0.4" upper="0.4"/>
-    <dynamics damping="0.5" friction="0.1"/>
+    <limit effort="40" velocity="4.0" lower="-0.4" upper="0.4"/>
+    <dynamics damping="1.5" friction="0.2"/>
   </joint>
 
   <link name="right_foot">
     <visual>
       <origin xyz="0.05 0 -0.015" rpy="0 0 0"/>
-      <geometry>
-        <box size="0.15 0.08 0.03"/>
-      </geometry>
+      <geometry><box size="0.15 0.08 0.03"/></geometry>
       <material name="dark_grey"/>
     </visual>
     <collision>
       <origin xyz="0.05 0 -0.015" rpy="0 0 0"/>
-      <geometry>
-        <box size="0.15 0.08 0.03"/>
-      </geometry>
+      <geometry><box size="0.15 0.08 0.03"/></geometry>
     </collision>
     <inertial>
       <mass value="0.5"/>

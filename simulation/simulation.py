@@ -15,7 +15,7 @@ class Simulation:
         """Initializes the Simulation class.
 
             :param int simulation_type: If the simulation should include a graphical representation (p.GUI)
-                                            or not (p.DIRECT). Use p.DIRECT for performance.
+                                        or not (p.DIRECT). Use p.DIRECT for performance.
             :param Path creature_path: A path to the .urdf creature file that should be used.
             :param float surface_friction: Friction of the plane the creatures walk on.
             :param int, optional settle_steps: How many simulation steps to wait for the creature to reach a stable state.
@@ -60,17 +60,32 @@ class Simulation:
 
         revolute_joints_list = []
         spherical_joints_list = []
+        
+        revolute_torque_limits = []
+        spherical_torque_limits = []
+
         for i in range(p.getNumJoints(self.creatureId, physicsClientId=self.client_id)):
             info = p.getJointInfo(self.creatureId, i, physicsClientId=self.client_id)
             joint_type = info[2] 
+            
+            max_force = info[10] if info[10] > 0 else 1000.0
+            max_vel = info[11]
+
+            if max_vel > 0:
+                p.changeDynamics(self.creatureId, i, maxJointVelocity=max_vel, physicsClientId=self.client_id)
 
             if joint_type == p.JOINT_SPHERICAL:
                 spherical_joints_list.append(i)
+                spherical_torque_limits.append(max_force)
             elif joint_type != p.JOINT_FIXED:
                 revolute_joints_list.append(i)
+                revolute_torque_limits.append(max_force)
         
         self.revolute_joints: npt.NDArray[np.int32] = np.array(revolute_joints_list, dtype=np.int32)
         self.spherical_joints: npt.NDArray[np.int32] = np.array(spherical_joints_list, dtype=np.int32)
+        
+        self.revolute_max_forces: npt.NDArray[np.float64] = np.array(revolute_torque_limits, dtype=np.float64)
+        self.spherical_max_forces: npt.NDArray[np.float64] = np.array(spherical_torque_limits, dtype=np.float64)
 
         self.num_revolute = len(self.revolute_joints)
         self.num_spherical = len(self.spherical_joints)
@@ -241,11 +256,21 @@ class Simulation:
             raise ValueError(f"joint_ids and torques arrays must have the same length. "
                             f"Got {joint_ids.shape[0]} and {torques.shape[0]}")
         
+        if joint_ids.shape[0] == 0:
+            return
+
+        sorter = np.argsort(self.revolute_joints)
+        indices = sorter[np.searchsorted(self.revolute_joints, joint_ids, sorter=sorter)]
+        
+        relevant_limits = self.revolute_max_forces[indices]
+        
+        clipped_torques = np.clip(torques, -relevant_limits, relevant_limits)
+
         p.setJointMotorControlArray(
             bodyUniqueId=self.creatureId,
             jointIndices=joint_ids,
             controlMode=p.TORQUE_CONTROL,
-            forces=torques,
+            forces=clipped_torques,
             physicsClientId=self.client_id
         )
     
@@ -273,7 +298,17 @@ class Simulation:
             raise ValueError(f"Torques array has wrong shape. "
                             f"Expected (N, 3) but got {torques.shape}")
         
-        for j_id, t_vec in zip(joint_ids, torques):
+        if joint_ids.shape[0] == 0:
+            return
+        
+        sorter = np.argsort(self.spherical_joints)
+        indices = sorter[np.searchsorted(self.spherical_joints, joint_ids, sorter=sorter)]
+        relevant_limits = self.spherical_max_forces[indices]
+
+        limit_reshaped = relevant_limits[:, np.newaxis]
+        clipped_torques = np.clip(torques, -limit_reshaped, limit_reshaped)
+
+        for j_id, t_vec in zip(joint_ids, clipped_torques):
             p.setJointMotorControlMultiDof(
                 self.creatureId, 
                 j_id,
