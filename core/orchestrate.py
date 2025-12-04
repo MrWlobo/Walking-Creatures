@@ -52,10 +52,8 @@ def run_individual(indiv: NeuralNetwork, sim: Simulation, params: GeneticAlgorit
         RunResult: Run data.
     """
     # ensure that the same individual always get the same random seed for jitter, for reproducibility
-    indiv_str = indiv.__repr__().encode('utf-8')
-    stable_hash = zlib.adler32(indiv_str)
-    sim_seed = stable_hash % (2**32)
-    sim.reset_state(seed=sim_seed)
+    indiv_id = indiv.id.int % (2**32)
+    sim.reset_state(seed=indiv_id)
 
     n_revolute = sim.num_revolute
     n_spherical = sim.num_spherical

@@ -33,7 +33,8 @@ def crossover(parent1: NeuralNetwork, parent2: NeuralNetwork) -> NeuralNetwork:
 
         new_connections[connection] = copy.deepcopy(chosen_connection)
 
-    child = NeuralNetwork(nodes=new_nodes, connections=new_connections)
+    # ensure the child's id is the same as the fitter parent's id
+    child = NeuralNetwork(nodes=new_nodes, connections=new_connections, id=fitter.id)
     return child
 
 
@@ -87,6 +88,9 @@ def mutate(probabilities: list[int], individual: NeuralNetwork, weight_mutation_
             connection = random.choice(list(individual.connections.keys()))
             success = _mutate_node(connection, individual)
     
+    # reset the id after mutation to ensure the individual gets a new random seed
+    individual.reset_id()
+
     return individual
 
 

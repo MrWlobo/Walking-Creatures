@@ -245,19 +245,9 @@ class Simulation:
         :param npt.NDArray[np.float64] torques: A 1D NumPy array of torque values. Must have the same
                         length as joint_ids.
         """
-        if joint_ids.shape[0] == 0:
-            return
-        
         if any([i not in self.revolute_joints for i in joint_ids]):
             raise ValueError(f"joint_ids must represent revolute joints, not spherical."
                             f" Got {joint_ids}.")
-            
-        if joint_ids.shape[0] != torques.shape[0]:
-            raise ValueError(f"joint_ids and torques arrays must have the same length. "
-                            f"Got {joint_ids.shape[0]} and {torques.shape[0]}")
-        
-        if joint_ids.shape[0] == 0:
-            return
 
         sorter = np.argsort(self.revolute_joints)
         indices = sorter[np.searchsorted(self.revolute_joints, joint_ids, sorter=sorter)]
@@ -283,23 +273,9 @@ class Simulation:
         :param npt.NDArray[np.float64] torques: A 2D NumPy array of torque vectors. Must have shape
                         (len(joint_ids), 3).
         """
-        if joint_ids.shape[0] == 0:
-            return
-        
         if any([i not in self.spherical_joints for i in joint_ids]):
             raise ValueError(f"joint_ids must represent spherical joints, not revolute."
                             f" Got {joint_ids}.")
-
-        if joint_ids.shape[0] != torques.shape[0]:
-            raise ValueError(f"joint_ids and torques arrays must have the same length (dim 0). "
-                            f"Got {joint_ids.shape[0]} and {torques.shape[0]}")
-
-        if torques.ndim != 2 or torques.shape[1] != 3:
-            raise ValueError(f"Torques array has wrong shape. "
-                            f"Expected (N, 3) but got {torques.shape}")
-        
-        if joint_ids.shape[0] == 0:
-            return
         
         sorter = np.argsort(self.spherical_joints)
         indices = sorter[np.searchsorted(self.spherical_joints, joint_ids, sorter=sorter)]

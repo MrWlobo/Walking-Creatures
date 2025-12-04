@@ -2,6 +2,7 @@ import math
 import random
 from typing import Callable
 from collections import defaultdict, deque
+import uuid
 import numpy as np
 
 def relu(x):
@@ -19,7 +20,7 @@ class NeuralNetwork:
     connection_split_table = {} # connection: id of node that splits the connection
 
 
-    def __init__(self, input_units: int = None, units_1d: int = None, units_3d: int = None, beginning_connections: int = 2, output_activation_function: Callable = math.tanh, hidden_activation_function: Callable = relu,  nodes: dict[int, str] = None, connections: dict[tuple[int, int], dict[str, float | bool]] = None):
+    def __init__(self, input_units: int = None, units_1d: int = None, units_3d: int = None, beginning_connections: int = 2, output_activation_function: Callable = math.tanh, hidden_activation_function: Callable = relu,  nodes: dict[int, str] = None, connections: dict[tuple[int, int], dict[str, float | bool]] = None, id: uuid.UUID = None):
         """
         Initialize a NEAT-style neural network with input and output units.
 
@@ -36,9 +37,15 @@ class NeuralNetwork:
             hidden_activation_function (Callable, optional) : Activation used for hidden nodes.
             nodes (dict[int, str], optional): Existing nodes to initialize the network. Keys are node IDs, values are types ("input", "hidden", "output").
             connections (dict[tuple[int, int], dict[str, float | bool]], optional): Existing connections to initialize the network. Keys are (source, target) tuples.
+            id (uuid.UUID): 'Unique' id of the neural network. Should change after mutations and be the same as the fitter parent after crossover.
         """
         random.seed()
         np.random.seed()
+
+        if id is None:
+            self.id = uuid.uuid4()
+        else:
+            self.id = id
         
         if nodes is not None and connections is not None:
             self.input_units = len([n for n, t in nodes.items() if t == "input"])
@@ -230,8 +237,14 @@ class NeuralNetwork:
 
     def __repr__(self):
         result = []
-        for key in sorted(self.connections.keys()):
+        for key in self.connections.keys():
             val = self.connections[key]
             result.append(f"{key}: {val}") 
         
         return "\n".join(result)
+    
+
+    def reset_id(self):
+        """Sets a new uuid for the neural network.
+        """
+        self.id = uuid.uuid4()
