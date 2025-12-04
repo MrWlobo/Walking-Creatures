@@ -15,7 +15,8 @@ def serialize_network(network: NeuralNetwork, path: Path, filename: str) -> None
 
     data = {
         "nodes": network.nodes,
-        "connections": {f"{k[0]},{k[1]}": v for k, v in network.connections.items()}
+        "connections": {f"{k[0]},{k[1]}": v for k, v in network.connections.items()},
+        "id": network.id,
     }
 
     file = path / f"{filename}.json"
@@ -44,5 +45,6 @@ def deserialize_network(file: Path) -> NeuralNetwork:
         data = json.load(f)
     nodes = {int(k): v for k, v in data["nodes"].items()}
     connections = {tuple(map(int, k.split(","))): v for k, v in data["connections"].items()}
+    id = int(data["id"])
 
-    return NeuralNetwork(nodes=nodes, connections=connections)
+    return NeuralNetwork(nodes=nodes, connections=connections, id=id)
