@@ -32,6 +32,7 @@ if __name__ == "__main__":
         genetic_operation_ratios=(0.7, 0.3),
         mutation_type_percentages=[60, 37.5, 2.5],
         weight_mutation_params=(0.01, -2.2, 2.2, -10.0, 10.0),
+        mutation_after_crossover_probability=0.15,
         
         indiv_output_scale=7.0,
         

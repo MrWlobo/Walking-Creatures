@@ -158,6 +158,11 @@ def _generate_offspring_batch(args):
                 indiv1 = params.selection.select(species)
                 indiv2 = params.selection.select(species)
                 offspring = crossover(indiv1, indiv2)
+
+                rcm = random.random()
+                if rcm < params.mutation_after_crossover_probability:
+                    print("AAAA")
+                    offspring = mutate(params.mutation_type_percentages, offspring, params.weight_mutation_params)
             else:
                 # mutate otherwise
                 indiv = params.selection.select(species)
