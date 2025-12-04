@@ -264,3 +264,63 @@ class Visualization:
             plt.show()
         
         plt.close(figure)
+
+    def line_plot(self, values: list[float], title: str, y_label: str, filename: str, save_image: bool = False, show_image: bool = True) -> None:
+        """
+        Plot a line graph of a metric across generations.
+
+        The function creates a simple line plot showing how a given metric evolves
+        over time.
+
+        Parameters
+        ----------
+        values : list of float
+            A sequence of numerical values to plot, one for each generation.
+
+        title : str
+            The title displayed above the plot.
+
+        y_label : str
+            Label for the y-axis, describing the metric being plotted.
+
+        filename : str
+            Base filename for saving the image. The plot will be saved under
+            `self.save_folder/<filename>.png` if `save_image` is True.
+
+        save_image : bool, optional (default=False)
+            If True, saves the plot to disk.
+
+        show_image : bool, optional (default=True)
+            If True, displays the plot using Matplotlib.
+
+        Raises
+        ------
+        ValueError
+            If `values` is empty.
+
+        Returns
+        -------
+        None
+            The function generates a plot and optionally saves or displays it.
+        """
+
+        if not values:
+            raise ValueError("There are no values.")
+
+        X = list(range(0, len(values)))
+        Y = values
+
+        plt.plot(X, Y)
+        plt.xlabel("Generation")
+        plt.ylabel(y_label)
+        plt.title(title)
+        plt.tight_layout()
+
+        file = Path(self.save_folder, f"{filename}.png")
+        if save_image:
+            file.parent.mkdir(parents=True, exist_ok=True)
+            plt.savefig(file, bbox_inches="tight", dpi=150)
+
+        if show_image:
+            plt.show()
+
