@@ -265,7 +265,7 @@ class Visualization:
         
         plt.close(figure)
 
-    def line_plot(self, values: list[float], title: str, y_label: str, filename: str, save_image: bool = False, show_image: bool = True) -> None:
+    def line_plot(self, values: list[float], axis: Axis, title: str, y_label: str, filename: str, save_image: bool = False, show_image: bool = True) -> None:
         """
         Plot a line graph of a metric across generations.
 
@@ -276,6 +276,9 @@ class Visualization:
         ----------
         values : list of float
             A sequence of numerical values to plot, one for each generation.
+
+        axis : matplotlib.axes.Axes
+            The axes on which to draw the scatter plot.
 
         title : str
             The title displayed above the plot.
@@ -310,11 +313,10 @@ class Visualization:
         X = list(range(0, len(values)))
         Y = values
 
-        plt.plot(X, Y)
-        plt.xlabel("Generation")
-        plt.ylabel(y_label)
-        plt.title(title)
-        plt.tight_layout()
+        axis.plot(X, Y)
+        axis.set_xlabel("Generation")
+        axis.set_ylabel(y_label)
+        axis.set_title(title)
 
         file = Path(self.save_folder, f"{filename}.png")
         if save_image:

@@ -23,7 +23,7 @@ if __name__ == "__main__":
         state_getter=FullJointStateGetter(),
         run_conditions=FallOrTimeoutRunConditions(max_time_seconds=10, height_threshold=0.2),
         
-        population_size=2_000,
+        population_size=50,
         n_generations=500,
         
         initial_connections=4,

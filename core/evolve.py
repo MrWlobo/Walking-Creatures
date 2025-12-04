@@ -5,7 +5,8 @@ from datetime import datetime
 import json
 import logging
 from pathlib import Path
-import matplotlib 
+import matplotlib
+import numpy as np
 from matplotlib import pyplot as plt
 import pybullet as p
 
@@ -26,6 +27,8 @@ class GeneticAlgorithm:
     """
     def __init__(self, params: GeneticAlgorithmParams):
         self.params: GeneticAlgorithmParams = params
+        self.best_fitness_values = []
+        self.mean_fitness_values = []
         
         # check if paths are relative, to make saved results retrievable
         if params.results_path.is_absolute():
@@ -113,7 +116,7 @@ class GeneticAlgorithm:
             logging.info(f"Generation {generation} finished.")
 
 
-    def _save_generation_stats(self, generation: int, curr_species: list[list[NeuralNetwork]], initial_fitness_stats: FitnessStats, species_fitness_stats: list[FitnessStats]):
+    def _save_generation_stats(self, generation: int, curr_species: list[list[NeuralNetwork]], initial_fitness_stats: FitnessStats, species_fitness_stats: list[FitnessStats], fitness_plot_interval: int = 20):
         GEN_DIR = self.save_dir / f"generation-{generation}"
         GEN_DIR.mkdir(parents=True, exist_ok=True)
         
@@ -139,6 +142,16 @@ class GeneticAlgorithm:
         self.global_best = max([self.global_best, best_indiv], key=lambda i: i.fitness_info)
         serialize_network(self.global_best, GEN_DIR, "global_fittest_individual")
         viz.visualize_network(self.global_best, ax, "global_fittest_individual_img", save_image=True, show_image=False, title=f"Global fittest individual with a fitness value of {self.global_best.fitness_info}")
+
+        self.best_fitness_values.append(initial_fitness_stats.best_fitness)
+        self.mean_fitness_values.append(initial_fitness_stats.mean_fitness)
+
+        # save average and best fitness for all generations
+        if generation >= fitness_plot_interval and generation % fitness_plot_interval == 0:
+            fig, ax = plt.subplots(1, 1)
+            viz.line_plot(self.best_fitness_values, ax, "Best fitness across generations", "Best fitness", f"Generation_{generation}_best_fitness_values", True, False)
+            fig, ax = plt.subplots(1, 1)
+            viz.line_plot(self.mean_fitness_values, ax, "Mean fitness across generations", "Mean fitness",f"Generation_{generation}_mean_fitness_values", True, False)
         
         plt.close('all')
     
