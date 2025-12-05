@@ -170,6 +170,22 @@ class FullJointStateGetter(CreatureStateGetter):
         return f"{type(self).__name__}()"
 
 
+class BaseAndFullJointStateGetter(CreatureStateGetter):
+    """CreatureStateGetter implementation that extracts all joint and creature base information from the simulation
+        and returns it as a flat numpy array.
+    """
+    def get_state(self, simulation: Simulation)  -> npt.NDArray[np.float64]:
+        r_positions, r_velocities = simulation.get_revolute_joint_states()
+        s_positions, s_velocities = simulation.get_spherical_joint_states()
+        _, base_orientation = simulation.get_base_state()
+
+        return _combine_inputs([base_orientation, r_positions, r_velocities, s_positions, s_velocities])
+    
+    
+    def __repr__(self):
+        return f"{type(self).__name__}()"
+
+
 def _combine_inputs(arrays) -> npt.NDArray:
     """
     Takes N inputs (arrays or lists), flattens them, 
