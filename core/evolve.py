@@ -1,5 +1,5 @@
 import math
-import pickle
+import dill
 from dataclasses import asdict
 from datetime import datetime
 import json
@@ -9,6 +9,7 @@ import matplotlib
 import numpy as np
 from matplotlib import pyplot as plt
 import pybullet as p
+from collections.abc import Callable
 
 from core.types import GeneticAlgorithmParams
 from evolution.fitness import FitnessStats, evaluate_population
@@ -74,7 +75,7 @@ class GeneticAlgorithm:
             json.dump(asdict(self.params), f, indent=4, default=str)
         
         with open((self.save_dir / "params.pkl").resolve(), "wb") as f:
-            pickle.dump(self.params, f)
+            dill.dump(self.params, f)
         
         self.global_best = NeuralNetwork(self.input_units, self.units_1d, self.units_3d)
         self.global_best.fitness_info = float('-inf')
@@ -103,7 +104,7 @@ class GeneticAlgorithm:
             new_species_sizes = calculate_new_species_sizes(self.population)
             
             # generate a new population using genetic operations
-            self.population = create_next_generation(self.population, new_species_sizes, self.params)
+            self.population = create_next_generation(self.population, new_species_sizes, self.params, generation)
             
             # save generation stats
             self._save_generation_stats(generation, curr_species, initial_fitness_stats, species_fitness_stats)
@@ -180,19 +181,31 @@ class GeneticAlgorithm:
         if p.initial_connections < 0:
             raise ValueError(f"Initial connections cannot be negative. Got: {p.initial_connections}")
 
-        if not (0.0 <= p.succession_ratio <= 1.0):
+        if isinstance(p.succession_ratio, int):
+            p.succession_ratio = float(p.succession_ratio)
+
+        if not isinstance(p.succession_ratio, float) and not isinstance(p.succession_ratio, Callable):
+            raise ValueError(f"succession_ratio must be a float or Callable Got: {type(p.succession_ratio)}")
+
+        if isinstance(p.succession_ratio, float) and not (0.0 <= p.succession_ratio <= 1.0):
             raise ValueError(f"succession_ratio must be between 0.0 and 1.0. Got: {p.succession_ratio}")
 
-        if len(p.genetic_operation_ratios) != 2:
+        if not isinstance(p.genetic_operation_ratios, tuple) and not isinstance(p.genetic_operation_ratios, Callable):
+            raise ValueError(f"genetic_operation_ratios must be a tuple or Callable Got: {type(p.genetic_operation_ratios)}")
+
+        if isinstance(p.genetic_operation_ratios, tuple) and len(p.genetic_operation_ratios) != 2:
             raise ValueError("genetic_operation_ratios must be a tuple of length 2 (crossover, mutation).")
         
-        if not all(0.0 <= r <= 1.0 for r in p.genetic_operation_ratios):
+        if isinstance(p.genetic_operation_ratios, tuple) and not all(0.0 <= r <= 1.0 for r in p.genetic_operation_ratios):
             raise ValueError("All values in genetic_operation_ratios must be between 0.0 and 1.0.")
 
-        if len(p.mutation_type_percentages) != 3:
+        if not isinstance(p.mutation_type_percentages, list) and not isinstance(p.mutation_type_percentages, Callable):
+            raise ValueError(f"mutation_type_percentages must be a tuple or Callable Got: {type(p.mutation_type_percentages)}")
+
+        if isinstance(p.mutation_type_percentages, list) and len(p.mutation_type_percentages) != 3:
             raise ValueError("mutation_type_percentages must have exactly 3 values [weight, connection, node].")
         
-        if not math.isclose(sum(p.mutation_type_percentages), 100.0, rel_tol=1e-5):
+        if isinstance(p.mutation_type_percentages, list) and not math.isclose(sum(p.mutation_type_percentages), 100.0, rel_tol=1e-5):
             raise ValueError(f"mutation_type_percentages must sum to 100. Got sum: {sum(p.mutation_type_percentages)}")
         
         if len(p.weight_mutation_params) != 5:
@@ -200,6 +213,15 @@ class GeneticAlgorithm:
         
         if p.weight_mutation_params[0] < 0 or p.weight_mutation_params[0] > 1:
             raise ValueError("weight_mutation_params[0] must represent a valid probability value")
+        
+        if isinstance(p.mutation_after_crossover_probability, int):
+            p.mutation_after_crossover_probability = float(p.mutation_after_crossover_probability)
+
+        if not isinstance(p.mutation_after_crossover_probability, float) and not isinstance(p.mutation_after_crossover_probability, Callable):
+            raise ValueError(f"mutation_after_crossover_probability must be a float or Callable Got: {type(p.mutation_after_crossover_probability)}")
+        
+        if isinstance(p.mutation_after_crossover_probability, float) and not (0.0 <= p.mutation_after_crossover_probability <= 1.0):
+            raise ValueError(f"mutation_after_crossover_probability must be between 0.0 and 1.0. Got: {p.mutation_after_crossover_probability}")
 
         if len(p.speciation_coefficients) != 3:
             raise ValueError("speciation_coefficients must have exactly 3 values.")

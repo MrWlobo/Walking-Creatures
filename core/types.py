@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
+from collections.abc import Callable
 from dataclasses import dataclass
 import numpy as np
 import abc
@@ -26,18 +27,22 @@ class GeneticAlgorithmParams:
         population_size (int): Number of individuals in each generation.
         n_generations (int): Number of generations to rune the genetic algorithm for.
         initial_connections (int): Number of initial random connections between neurons of each individual.
-        succession_ratio (float): Percentage of top individuals to copy to the next population each generation.
-        genetic_operation_ratios (tuple[float, float]): Probabilities of applying crossover and mutation
+        succession_ratio (float | Callable[[int], float]): Percentage of top individuals to copy to the next population each generation.
+                                                            If a function is passed, it should return a float for each generation number it gets as an argument.
+        genetic_operation_ratios (tuple[float, float] | Callable[[int], tuple[float, float]]): Probabilities of applying crossover and mutation
                                                                 operations, respectively.
-        mutation_type_percentages (list[float]): List of 3 integers representing percent chance for 
+                                                                If a function is passed, it should return a tuple of 2 floats for each generation number it gets as an argument.
+        mutation_type_percentages (list[float] | Callable[[int], list[float]]): List of 3 integers representing percent chance for 
                                                     [0] mutate weight, [1] mutate connection, [2] mutate node. Must sum to 100.
+                                                    If a function is passed, it should return a list of 3 integers for each generation number it gets as an argument.
         weight_mutation_params (tuple[float, float, float, float, float]): Parameters controlling weight mutation
                                                                         * **0**: Probability of perturbing vs replacing a weight.
                                                                         * **1**: Minimum additive perturbation.
                                                                         * **2**: Maximum additive perturbation.
                                                                         * **3**: Minimum value for full weight replacement.
                                                                         * **4**: Maximum value for full weight replacement.
-        mutation_after_crossover_probability (float): Probability of performing and additional mutation for offspring genearted via crossover.
+        mutation_after_crossover_probability (float | Callable[[int], float]): Probability of performing and additional mutation for offspring genearted via crossover.
+                                                                                If a function is passed, it should return a float for each generation number it gets as an argument.
         indiv_output_scale (float): Value to multiply NN outputs by before passing them to joint control functions.
                                     Used to match the appropriate order of magnitude of forces for the particular creature.
         speciation_coefficients (tuple[float, float, float]): Weights for (excess, disjoint, weight differences)
@@ -59,11 +64,11 @@ class GeneticAlgorithmParams:
     population_size: int
     n_generations: int
     initial_connections: int
-    succession_ratio: float
-    genetic_operation_ratios: tuple[float, float]
-    mutation_type_percentages: list[float]
+    succession_ratio: float | Callable[[int], float]
+    genetic_operation_ratios: tuple[float, float] | Callable[[int], tuple[float, float]]
+    mutation_type_percentages: list[float] | Callable[[int], list[float]]
     weight_mutation_params: tuple[float, float, float, float, float]
-    mutation_after_crossover_probability: float
+    mutation_after_crossover_probability: float | Callable[[int], float]
     indiv_output_scale: float
     speciation_coefficients: tuple[float, float, float]
     speciation_compatibility_distance: float

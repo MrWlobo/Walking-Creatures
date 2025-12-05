@@ -1,6 +1,6 @@
 import copy
 import heapq
-import multiprocessing
+import multiprocess as multiprocessing
 import os
 import random
 import numpy as np
@@ -45,7 +45,7 @@ def generate_random_individual(input_units: int, units_1d: int, units_3d: int, i
     return network
 
 
-def create_next_generation(population: list[list[NeuralNetwork]], new_species_sizes: list[int], params: GeneticAlgorithmParams) -> list[NeuralNetwork]:
+def create_next_generation(population: list[list[NeuralNetwork]], new_species_sizes: list[int], params: GeneticAlgorithmParams, generation: int) -> list[NeuralNetwork]:
     """Creates a new (not speciated) population from an old (speciated) population.
     
     The process is parallelized, using batches to minimize communication between threads.
@@ -64,7 +64,13 @@ def create_next_generation(population: list[list[NeuralNetwork]], new_species_si
     # global elitism
     all_individuals = [indiv for species in population for indiv in species]
     
-    n_global_elites = int(np.ceil(params.succession_ratio * total_target_size))
+    # get succesion ration directly from params or from a function stored in params
+    if isinstance(params.succession_ratio, float):
+        succession_ratio = params.succession_ratio
+    else:
+        succession_ratio = params.succession_ratio(generation)
+
+    n_global_elites = int(np.ceil(succession_ratio * total_target_size))
     n_global_elites = min(n_global_elites, total_target_size)
     
     elite_indivs = heapq.nlargest(n_global_elites, all_individuals, key=lambda i: i.fitness_info)
@@ -73,6 +79,21 @@ def create_next_generation(population: list[list[NeuralNetwork]], new_species_si
     
     # calculate number of remaining spots in the new population (after elitism)
     remaining_spots = total_target_size - len(new_population)
+
+    if isinstance(params.genetic_operation_ratios, tuple):
+        genetic_operation_ratios = params.genetic_operation_ratios
+    else:
+        genetic_operation_ratios = params.genetic_operation_ratios(generation)
+    
+    if isinstance(params.mutation_type_percentages, list):
+        mutation_type_percentages = params.mutation_type_percentages
+    else:
+        mutation_type_percentages = params.mutation_type_percentages(generation)
+    
+    if isinstance(params.mutation_after_crossover_probability, float):
+        mutation_after_crossover_probability = params.mutation_after_crossover_probability
+    else:
+        mutation_after_crossover_probability = params.mutation_after_crossover_probability(generation)
     
     if remaining_spots > 0:
         tasks = []
@@ -107,12 +128,12 @@ def create_next_generation(population: list[list[NeuralNetwork]], new_species_si
                 
                 # for small species using multiple threads is unnecessary
                 if count < num_processes:
-                    tasks.append((species, count, params))
+                    tasks.append((species, count, params, genetic_operation_ratios, mutation_type_percentages, mutation_after_crossover_probability))
                 else:
                     for i in range(num_processes):
                         chunk = base_chunk + (1 if i < remainder_chunk else 0)
                         if chunk > 0:
-                            tasks.append((species, chunk, params))
+                            tasks.append((species, chunk, params, genetic_operation_ratios, mutation_type_percentages, mutation_after_crossover_probability))
 
             # offspring generation
             if tasks:
@@ -131,7 +152,7 @@ def _generate_offspring_batch(args):
     """
     Worker: Generates 'batch_size' offspring for the provided species.
     """
-    species, batch_size, params = args
+    species, batch_size, params, genetic_operation_ratios, mutation_type_percentages, mutation_after_crossover_probability = args
     
     if batch_size <= 0:
         return []
@@ -140,7 +161,7 @@ def _generate_offspring_batch(args):
     np.random.seed()
 
     batch_results = []
-    crossover_thresh = params.genetic_operation_ratios[0]
+    crossover_thresh = genetic_operation_ratios[0]
     
     for _ in range(batch_size):
         offspring = None
@@ -160,12 +181,12 @@ def _generate_offspring_batch(args):
                 offspring = crossover(indiv1, indiv2)
 
                 rcm = random.random()
-                if rcm < params.mutation_after_crossover_probability:
-                    offspring = mutate(params.mutation_type_percentages, offspring, params.weight_mutation_params)
+                if rcm < mutation_after_crossover_probability:
+                    offspring = mutate(mutation_type_percentages, offspring, params.weight_mutation_params)
             else:
                 # mutate otherwise
                 indiv = params.selection.select(species)
-                offspring = mutate(params.mutation_type_percentages, copy.deepcopy(indiv), params.weight_mutation_params)
+                offspring = mutate(mutation_type_percentages, copy.deepcopy(indiv), params.weight_mutation_params)
         
         if not isinstance(offspring, NeuralNetwork):
             raise RuntimeError(f"Worker generated {type(offspring)} instead of NeuralNetwork")

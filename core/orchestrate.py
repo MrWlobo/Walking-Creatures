@@ -1,5 +1,4 @@
-import multiprocessing
-import zlib
+import multiprocess as multiprocessing
 import pybullet as p
 from functools import partial
 import atexit
