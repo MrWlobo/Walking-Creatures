@@ -70,7 +70,7 @@ def mutate(probabilities: list[int], individual: NeuralNetwork, weight_mutation_
     selected = random.uniform(1, 100)
 
     if selected <= probabilities[0]:
-        connection = random.choice(list(individual.connections.keys()))
+        connection = random.choice([connection for connection in individual.connections.keys() if individual.connections[connection]["enabled"]])
         _mutate_weight(connection, individual, weight_mutation_params)
 
     elif selected <= (probabilities[0] + probabilities[1]):
@@ -85,7 +85,7 @@ def mutate(probabilities: list[int], individual: NeuralNetwork, weight_mutation_
     else:
         success = False
         while not success:
-            connection = random.choice(list(individual.connections.keys()))
+            connection = random.choice([connection for connection in individual.connections.keys() if individual.connections[connection]["enabled"]])
             success = _mutate_node(connection, individual)
     
     # reset the id after mutation to ensure the individual gets a new random seed
