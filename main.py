@@ -1,6 +1,8 @@
 from pathlib import Path
+from scipy.special import softmax
+
 from core.evolve import GeneticAlgorithm
-from core.types import FallOrTimeoutRunConditions, FullJointStateGetter, GeneticAlgorithmParams, TimeOnlyRunConditions
+from core.types import BaseAndFullJointStateGetter, FallOrTimeoutRunConditions, FullJointStateGetter, GeneticAlgorithmParams, TimeOnlyRunConditions
 from evolution.fitness import XDistanceFitness, XDistanceStabilityFitness
 from evolution.selection import TournamentSelection
 
@@ -20,24 +22,24 @@ if __name__ == "__main__":
         
         fitness=XDistanceStabilityFitness(stability_coefficient=0.001),
         selection=TournamentSelection(tournament_size=10),
-        state_getter=FullJointStateGetter(),
-        run_conditions=FallOrTimeoutRunConditions(max_time_seconds=10, height_threshold=0.35),
+        state_getter=BaseAndFullJointStateGetter(),
+        run_conditions=FallOrTimeoutRunConditions(max_time_seconds=10, height_threshold=0.4),
         
-        population_size=1_000,
+        population_size=1000,
         n_generations=500,
         
         initial_connections=4,
         
-        succession_ratio=0,
-        genetic_operation_ratios=(0.7, 0.3),
+        succession_ratio=0.0,
+        genetic_operation_ratios=lambda i: (0.0, 1.0) if i < 20 else (softmax([0.01*i, 1]) if i < 184 else [0.7, 0.3]),
         mutation_type_percentages=[60, 37.5, 2.5],
-        weight_mutation_params=(0.2, -2.2, 2.2, -10.0, 10.0),
-        mutation_after_crossover_probability=1,
+        weight_mutation_params=(0.6, -2.2, 2.2, -10.0, 10.0),
+        mutation_after_crossover_probability=0.15,
         
         indiv_output_scale=7.0,
         
         speciation_coefficients=(1.5, 1.2, 0.04),
-        speciation_compatibility_distance=1.8,
+        speciation_compatibility_distance=1.6,
         
         n_processes=None
     )
