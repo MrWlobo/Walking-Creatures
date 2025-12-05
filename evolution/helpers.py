@@ -1,5 +1,8 @@
+from dataclasses import asdict
+import inspect
 import json
 from pathlib import Path
+from core.types import GeneticAlgorithmParams
 from evolution.neural_network import NeuralNetwork
 
 
@@ -48,3 +51,28 @@ def deserialize_network(file: Path) -> NeuralNetwork:
     id = int(data["id"])
 
     return NeuralNetwork(nodes=nodes, connections=connections, id=id)
+
+
+def get_params_dict(params: GeneticAlgorithmParams) -> dict:
+    """
+    Converts GeneticAlgorithmParams to a dict, converting any Callable fields 
+    (lambdas or functions) into their source code strings.
+    """
+    params_dict = asdict(params)
+
+    for key, value in params.__dict__.items():
+        if callable(value):
+            try:
+                source_line = inspect.getsource(value).strip()
+
+                if "lambda" in source_line:
+                    cleaned_source = "lambda " + source_line.split("lambda", 1)[1]
+                else:
+                    cleaned_source = source_line
+
+                params_dict[key] = cleaned_source.rstrip(",) \n\t")
+
+            except OSError:
+                params_dict[key] = "Source not available."
+
+    return params_dict

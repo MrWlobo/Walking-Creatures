@@ -6,14 +6,13 @@ import json
 import logging
 from pathlib import Path
 import matplotlib
-import numpy as np
 from matplotlib import pyplot as plt
 import pybullet as p
 from collections.abc import Callable
 
 from core.types import GeneticAlgorithmParams
 from evolution.fitness import FitnessStats, evaluate_population
-from evolution.helpers import serialize_network
+from evolution.helpers import get_params_dict, serialize_network
 from evolution.neural_network import NeuralNetwork
 from evolution.population import calculate_new_species_sizes, create_next_generation, create_species, generate_random_population
 from evolution.visualization import Visualization
@@ -71,8 +70,9 @@ class GeneticAlgorithm:
         self.save_dir.mkdir(parents=True, exist_ok=True)
         
         # save GA params
+        params_dict = get_params_dict(self.params)
         with open((self.save_dir / "params.json").resolve(), "w") as f:
-            json.dump(asdict(self.params), f, indent=4, default=str)
+            json.dump(params_dict, f, indent=4, default=str)
         
         with open((self.save_dir / "params.pkl").resolve(), "wb") as f:
             dill.dump(self.params, f)
