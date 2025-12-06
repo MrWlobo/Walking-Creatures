@@ -89,11 +89,46 @@ class XDistanceFitness(Fitness):
     
     def __repr__(self):
         return f"{type(self).__name__}()"
+
+
+class AbsXDistanceFitness(Fitness):
+    """
+    A fitness function that rewards distance traveled
+    along the positive or negative X-axis.
+    """
+    def calculate(self, run_result: RunResult) -> float:
+        return np.abs(run_result.final_position[0])
+    
+
+    def adjustSpeciesFitness(self, species: list[list[NeuralNetwork]]) -> list[list[NeuralNetwork]]:
+        for s in species:
+            curr_size = len(s)
+
+            for indiv in s:
+                indiv.fitness_value /= curr_size
+        
+        return species
+    
+
+    def getStats(self, population: list[NeuralNetwork]) -> FitnessStats:
+        if any([i is None for i in population]):
+            raise NoneFitnessException(f"Encountered None fitness value, population: {population}")
+        
+        fitness = np.array([indiv.fitness_info for indiv in population])
+
+        return FitnessStats(
+            best_fitness=np.max(fitness),
+            mean_fitness=np.mean(fitness),
+        )
+    
+    
+    def __repr__(self):
+        return f"{type(self).__name__}()"
     
 
 class XDistanceStabilityFitness(Fitness):
     """
-    A fitness function that rewards distance traveled
+    A fitness function that rewards distance traveled along the positive X-axis
     and time until the first fall.
     """
     def __init__(self, stability_coefficient: float):
@@ -107,6 +142,50 @@ class XDistanceStabilityFitness(Fitness):
     
     def calculate(self, run_result: RunResult) -> float:
         return run_result.final_position[0] + self.stability_coefficient * run_result.time_seconds
+    
+
+    def adjustSpeciesFitness(self, species: list[list[NeuralNetwork]]) -> list[list[NeuralNetwork]]:
+        for s in species:
+            curr_size = len(s)
+
+            for indiv in s:
+                indiv.fitness_value /= curr_size
+        
+        return species
+    
+
+    def getStats(self, population: list[NeuralNetwork]) -> FitnessStats:
+        if any([i is None for i in population]):
+            raise NoneFitnessException(f"Encountered None fitness value, population: {population}")
+        
+        fitness = np.array([indiv.fitness_info for indiv in population])
+
+        return FitnessStats(
+            best_fitness=np.max(fitness),
+            mean_fitness=np.mean(fitness),
+        )
+    
+    
+    def __repr__(self):
+        return f"{type(self).__name__}(stability_coefficient={self.stability_coefficient})"
+
+
+class AbsXDistanceStabilityFitness(Fitness):
+    """
+    A fitness function that rewards distance traveled along the positive or negative X-axis
+    and time until the first fall.
+    """
+    def __init__(self, stability_coefficient: float):
+        """Initializes AbsXDistanceStabilityFitness.
+
+        Args:
+            stability_coefficient (float): A coefficient to multiply the time until first fall by.
+        """
+        self.stability_coefficient = stability_coefficient
+    
+    
+    def calculate(self, run_result: RunResult) -> float:
+        return np.abs(run_result.final_position[0]) + self.stability_coefficient * run_result.time_seconds
     
 
     def adjustSpeciesFitness(self, species: list[list[NeuralNetwork]]) -> list[list[NeuralNetwork]]:

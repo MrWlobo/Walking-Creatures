@@ -31,7 +31,7 @@ if __name__ == "__main__":
         initial_connections=4,
         
         succession_ratio=0.0,
-        genetic_operation_ratios=lambda i: (0.0, 1.0) if i < 20 else (softmax([0.01*i, 1]) if i < 184 else [0.7, 0.3]),
+        genetic_operation_ratios=lambda i: (0.0, 1.0) if i < 20 else (softmax([0.01*i, 1]) if i < 184 else (0.7, 0.3)),
         mutation_type_percentages=[60, 37.5, 2.5],
         weight_mutation_params=(0.6, -2.2, 2.2, -10.0, 10.0),
         mutation_after_crossover_probability=0.15,
@@ -39,7 +39,7 @@ if __name__ == "__main__":
         indiv_output_scale=7.0,
         
         speciation_coefficients=(1.5, 1.2, 0.04),
-        speciation_compatibility_distance=1.6,
+        speciation_compatibility_distance=1.4,
         
         n_processes=None
     )
