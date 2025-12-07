@@ -1,5 +1,6 @@
 import random
 import copy
+import numpy as np
 
 from evolution.neural_network import NeuralNetwork
 
@@ -25,16 +26,23 @@ def crossover(parent1: NeuralNetwork, parent2: NeuralNetwork) -> NeuralNetwork:
     new_nodes = copy.deepcopy(fitter.nodes)
     new_connections = {}
 
+    # to determine whether the offspring should get a new id or a copy of the parent's id
+    is_offspring_copy_of_fitter = True
+
     for connection in fitter.connections:
         if connection in other.connections:
-            chosen_connection = random.choice([fitter.connections[connection], other.connections[connection]])
+            if random.random() < 0.5:
+                chosen_connection = fitter.connections[connection]
+            else:
+                is_offspring_copy_of_fitter = False
+                chosen_connection = other.connections[connection]
         else:
             chosen_connection = fitter.connections[connection]
 
         new_connections[connection] = copy.deepcopy(chosen_connection)
 
     # ensure the child's id is the same as the fitter parent's id
-    child = NeuralNetwork(nodes=new_nodes, connections=new_connections, id=fitter.id)
+    child = NeuralNetwork(nodes=new_nodes, connections=new_connections, id=fitter.id if is_offspring_copy_of_fitter else None)
     return child
 
 
@@ -64,8 +72,8 @@ def mutate(probabilities: list[int], individual: NeuralNetwork, weight_mutation_
     if len(probabilities) != 3:
         raise ValueError("There should be exactly 3 values in probabilities.")
 
-    if sum(probabilities) != 100:
-        raise ValueError("Probabilities should sum up to 100.")
+    if np.abs(sum(probabilities) - 100) > 0.001:
+        raise ValueError(f"Probabilities should sum up to 100. Got: {probabilities}")
 
     selected = random.uniform(1, 100)
 
