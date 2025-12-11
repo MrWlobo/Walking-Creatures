@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
-<robot name="4-spherical_4-revolute_spider-bot">
+<robot name="4-spherical_4-revolute_spider-bot_heavy">
   
   <link name="body_core">
     <inertial>
       <origin xyz="0 0 0"/>
-      <mass value="1.5"/>
-      <inertia ixx="0.03" ixy="0" ixz="0" iyy="0.03" iyz="0" izz="0.03"/>
+      <mass value="15.0"/>
+      <inertia ixx="0.4" ixy="0" ixz="0" iyy="0.4" iyz="0" izz="0.4"/>
     </inertial>
     <visual>
       <origin xyz="0 0 0"/>
@@ -27,8 +27,8 @@
   <link name="hip_fl_link">
     <inertial>
       <origin xyz="0 0 -0.1"/>
-      <mass value="0.3"/>
-      <inertia ixx="0.002" ixy="0" ixz="0" iyy="0.002" iyz="0" izz="0.0002"/>
+      <mass value="3.0"/>
+      <inertia ixx="0.05" ixy="0" ixz="0" iyy="0.05" iyz="0" izz="0.01"/>
     </inertial>
     <visual>
       <origin xyz="0 0 -0.1" rpy="0 0 0"/>
@@ -37,23 +37,28 @@
     </visual>
     <collision>
       <origin xyz="0 0 -0.1" rpy="0 0 0"/>
-      <geometry><cylinder length="0.2" radius="0.03"/></geometry>
+      <geometry><capsule length="0.18" radius="0.02"/></geometry> 
     </collision>
   </link>
 
   <joint name="hip_fl" type="spherical">
-    <dynamics damping="1.0" friction="0.1"/>
+    <dynamics damping="2.0" friction="0.8"/>
     <origin xyz="0.2 0.2 0" rpy="0 0 0"/>
     <parent link="body_core"/>
     <child link="hip_fl_link"/>
-    <limit effort="80" velocity="6.0"/>
+    <axis xyz="0 0 0"/> 
+    <limit effort="45" velocity="6.0" lower="-0.5" upper="0.5"/>
   </joint>
 
   <link name="knee_fl_link">
+    <contact>
+      <lateral_friction value="1.0"/>
+      <spinning_friction value="0.1"/>
+    </contact>
     <inertial>
       <origin xyz="0 0 -0.1"/>
-      <mass value="0.3"/>
-      <inertia ixx="0.002" ixy="0" ixz="0" iyy="0.002" iyz="0" izz="0.0002"/>
+      <mass value="3.0"/>
+      <inertia ixx="0.05" ixy="0" ixz="0" iyy="0.05" iyz="0" izz="0.01"/>
     </inertial>
     <visual>
       <origin xyz="0 0 -0.1" rpy="0 0 0"/>
@@ -62,7 +67,7 @@
     </visual>
     <collision>
       <origin xyz="0 0 -0.1" rpy="0 0 0"/>
-      <geometry><cylinder length="0.2" radius="0.03"/></geometry>
+      <geometry><capsule length="0.18" radius="0.03"/></geometry>
     </collision>
     <collision>
         <origin xyz="0 0 -0.2" rpy="0 0 0"/>
@@ -71,20 +76,19 @@
   </link>
 
   <joint name="knee_fl" type="revolute">
-    <dynamics damping="1.0" friction="0.1"/>
+    <dynamics damping="1.0" friction="0.5"/>
     <origin xyz="0.0 0.0 -0.2" rpy="0 0 0"/>
     <parent link="hip_fl_link"/>
     <child link="knee_fl_link"/>
     <axis xyz="1 0 0"/>
-    <limit effort="60" velocity="8.0" lower="-0.1" upper="2.5"/>
+    <limit effort="30" velocity="8.0" lower="-0.1" upper="2.5"/>
   </joint>
-
 
   <link name="hip_fr_link">
     <inertial>
       <origin xyz="0 0 -0.1"/>
-      <mass value="0.3"/>
-      <inertia ixx="0.002" ixy="0" ixz="0" iyy="0.002" iyz="0" izz="0.0002"/>
+      <mass value="3.0"/>
+      <inertia ixx="0.05" ixy="0" ixz="0" iyy="0.05" iyz="0" izz="0.01"/>
     </inertial>
     <visual>
       <origin xyz="0 0 -0.1" rpy="0 0 0"/>
@@ -93,23 +97,28 @@
     </visual>
     <collision>
       <origin xyz="0 0 -0.1" rpy="0 0 0"/>
-      <geometry><cylinder length="0.2" radius="0.03"/></geometry>
+      <geometry><capsule length="0.18" radius="0.02"/></geometry>
     </collision>
   </link>
 
   <joint name="hip_fr" type="spherical">
-    <dynamics damping="1.0" friction="0.1"/>
+    <dynamics damping="2.0" friction="0.8"/>
     <origin xyz="0.2 -0.2 0" rpy="0 0 0"/>
     <parent link="body_core"/>
     <child link="hip_fr_link"/>
-    <limit effort="80" velocity="6.0"/>
+    <axis xyz="0 0 0"/> 
+    <limit effort="45" velocity="6.0" lower="-0.5" upper="0.5"/>
   </joint>
 
   <link name="knee_fr_link">
+    <contact>
+      <lateral_friction value="1.0"/>
+      <spinning_friction value="0.1"/>
+    </contact>
     <inertial>
       <origin xyz="0 0 -0.1"/>
-      <mass value="0.3"/>
-      <inertia ixx="0.002" ixy="0" ixz="0" iyy="0.002" iyz="0" izz="0.0002"/>
+      <mass value="3.0"/>
+      <inertia ixx="0.05" ixy="0" ixz="0" iyy="0.05" iyz="0" izz="0.01"/>
     </inertial>
     <visual>
       <origin xyz="0 0 -0.1" rpy="0 0 0"/>
@@ -118,7 +127,7 @@
     </visual>
     <collision>
       <origin xyz="0 0 -0.1" rpy="0 0 0"/>
-      <geometry><cylinder length="0.2" radius="0.03"/></geometry>
+      <geometry><capsule length="0.18" radius="0.03"/></geometry>
     </collision>
     <collision>
         <origin xyz="0 0 -0.2" rpy="0 0 0"/>
@@ -127,20 +136,19 @@
   </link>
 
   <joint name="knee_fr" type="revolute">
-    <dynamics damping="1.0" friction="0.1"/>
+    <dynamics damping="1.0" friction="0.5"/>
     <origin xyz="0.0 0.0 -0.2" rpy="0 0 0"/>
     <parent link="hip_fr_link"/>
     <child link="knee_fr_link"/>
     <axis xyz="1 0 0"/>
-    <limit effort="60" velocity="8.0" lower="-0.1" upper="2.5"/>
+    <limit effort="30" velocity="8.0" lower="-0.1" upper="2.5"/>
   </joint>
-
 
   <link name="hip_bl_link">
     <inertial>
       <origin xyz="0 0 -0.1"/>
-      <mass value="0.3"/>
-      <inertia ixx="0.002" ixy="0" ixz="0" iyy="0.002" iyz="0" izz="0.0002"/>
+      <mass value="3.0"/>
+      <inertia ixx="0.05" ixy="0" ixz="0" iyy="0.05" iyz="0" izz="0.01"/>
     </inertial>
     <visual>
       <origin xyz="0 0 -0.1" rpy="0 0 0"/>
@@ -149,23 +157,28 @@
     </visual>
     <collision>
       <origin xyz="0 0 -0.1" rpy="0 0 0"/>
-      <geometry><cylinder length="0.2" radius="0.03"/></geometry>
+      <geometry><capsule length="0.18" radius="0.02"/></geometry>
     </collision>
   </link>
 
   <joint name="hip_bl" type="spherical">
-    <dynamics damping="1.0" friction="0.1"/>
+    <dynamics damping="2.0" friction="0.8"/>
     <origin xyz="-0.2 0.2 0" rpy="0 0 0"/>
     <parent link="body_core"/>
     <child link="hip_bl_link"/>
-    <limit effort="80" velocity="6.0"/>
+    <axis xyz="0 0 0"/> 
+    <limit effort="45" velocity="6.0" lower="-0.5" upper="0.5"/>
   </joint>
 
   <link name="knee_bl_link">
+    <contact>
+      <lateral_friction value="1.0"/>
+      <spinning_friction value="0.1"/>
+    </contact>
     <inertial>
       <origin xyz="0 0 -0.1"/>
-      <mass value="0.3"/>
-      <inertia ixx="0.002" ixy="0" ixz="0" iyy="0.002" iyz="0" izz="0.0002"/>
+      <mass value="3.0"/>
+      <inertia ixx="0.05" ixy="0" ixz="0" iyy="0.05" iyz="0" izz="0.01"/>
     </inertial>
     <visual>
       <origin xyz="0 0 -0.1" rpy="0 0 0"/>
@@ -174,7 +187,7 @@
     </visual>
     <collision>
       <origin xyz="0 0 -0.1" rpy="0 0 0"/>
-      <geometry><cylinder length="0.2" radius="0.03"/></geometry>
+      <geometry><capsule length="0.18" radius="0.03"/></geometry>
     </collision>
     <collision>
         <origin xyz="0 0 -0.2" rpy="0 0 0"/>
@@ -183,20 +196,19 @@
   </link>
 
   <joint name="knee_bl" type="revolute">
-    <dynamics damping="1.0" friction="0.1"/>
+    <dynamics damping="1.0" friction="0.5"/>
     <origin xyz="0.0 0.0 -0.2" rpy="0 0 0"/>
     <parent link="hip_bl_link"/>
     <child link="knee_bl_link"/>
     <axis xyz="1 0 0"/>
-    <limit effort="60" velocity="8.0" lower="-0.1" upper="2.5"/>
+    <limit effort="30" velocity="8.0" lower="-0.1" upper="2.5"/>
   </joint>
-
 
   <link name="hip_br_link">
     <inertial>
       <origin xyz="0 0 -0.1"/>
-      <mass value="0.3"/>
-      <inertia ixx="0.002" ixy="0" ixz="0" iyy="0.002" iyz="0" izz="0.0002"/>
+      <mass value="3.0"/>
+      <inertia ixx="0.05" ixy="0" ixz="0" iyy="0.05" iyz="0" izz="0.01"/>
     </inertial>
     <visual>
       <origin xyz="0 0 -0.1" rpy="0 0 0"/>
@@ -205,23 +217,28 @@
     </visual>
     <collision>
       <origin xyz="0 0 -0.1" rpy="0 0 0"/>
-      <geometry><cylinder length="0.2" radius="0.03"/></geometry>
+      <geometry><capsule length="0.18" radius="0.02"/></geometry>
     </collision>
   </link>
 
   <joint name="hip_br" type="spherical">
-    <dynamics damping="1.0" friction="0.1"/>
+    <dynamics damping="2.0" friction="0.8"/>
     <origin xyz="-0.2 -0.2 0" rpy="0 0 0"/>
     <parent link="body_core"/>
     <child link="hip_br_link"/>
-    <limit effort="80" velocity="6.0"/>
+    <axis xyz="0 0 0"/> 
+    <limit effort="45" velocity="6.0" lower="-0.5" upper="0.5"/>
   </joint>
 
   <link name="knee_br_link">
+    <contact>
+      <lateral_friction value="1.0"/>
+      <spinning_friction value="0.1"/>
+    </contact>
     <inertial>
       <origin xyz="0 0 -0.1"/>
-      <mass value="0.3"/>
-      <inertia ixx="0.002" ixy="0" ixz="0" iyy="0.002" iyz="0" izz="0.0002"/>
+      <mass value="3.0"/>
+      <inertia ixx="0.05" ixy="0" ixz="0" iyy="0.05" iyz="0" izz="0.01"/>
     </inertial>
     <visual>
       <origin xyz="0 0 -0.1" rpy="0 0 0"/>
@@ -230,7 +247,7 @@
     </visual>
     <collision>
       <origin xyz="0 0 -0.1" rpy="0 0 0"/>
-      <geometry><cylinder length="0.2" radius="0.03"/></geometry>
+      <geometry><capsule length="0.18" radius="0.03"/></geometry>
     </collision>
     <collision>
         <origin xyz="0 0 -0.2" rpy="0 0 0"/>
@@ -239,12 +256,12 @@
   </link>
 
   <joint name="knee_br" type="revolute">
-    <dynamics damping="1.0" friction="0.1"/>
+    <dynamics damping="1.0" friction="0.5"/>
     <origin xyz="0.0 0.0 -0.2" rpy="0 0 0"/>
     <parent link="hip_br_link"/>
     <child link="knee_br_link"/>
     <axis xyz="1 0 0"/>
-    <limit effort="60" velocity="8.0" lower="-0.1" upper="2.5"/>
+    <limit effort="30" velocity="8.0" lower="-0.1" upper="2.5"/>
   </joint>
 
 </robot>
