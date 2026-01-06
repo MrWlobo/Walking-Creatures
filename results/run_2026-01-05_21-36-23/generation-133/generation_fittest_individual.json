@@ -1,0 +1,222 @@
+{
+  "nodes": {
+    "0": "input",
+    "1": "input",
+    "2": "input",
+    "3": "input",
+    "4": "input",
+    "5": "input",
+    "6": "input",
+    "7": "input",
+    "8": "input",
+    "9": "input",
+    "10": "input",
+    "11": "input",
+    "12": "input",
+    "13": "input",
+    "14": "input",
+    "15": "output",
+    "16": "output",
+    "17": "output",
+    "18": "output",
+    "19": "output",
+    "20": "output",
+    "21": "hidden",
+    "22": "hidden"
+  },
+  "connections": {
+    "7,16": {
+      "weight": 6.047380407327527,
+      "enabled": false
+    },
+    "3,15": {
+      "weight": -1.1572438631332673,
+      "enabled": true
+    },
+    "5,16": {
+      "weight": 5.4121787946903925,
+      "enabled": true
+    },
+    "5,15": {
+      "weight": 6.671206922234866,
+      "enabled": false
+    },
+    "5,21": {
+      "weight": 8.666013715180993,
+      "enabled": false
+    },
+    "21,15": {
+      "weight": -3.225482642020756,
+      "enabled": true
+    },
+    "9,21": {
+      "weight": -9.778104074476477,
+      "enabled": true
+    },
+    "12,20": {
+      "weight": -0.3282333145234837,
+      "enabled": false
+    },
+    "4,15": {
+      "weight": 6.335135384989044,
+      "enabled": true
+    },
+    "13,18": {
+      "weight": -8.983013849435483,
+      "enabled": true
+    },
+    "9,16": {
+      "weight": -0.6097135683760739,
+      "enabled": true
+    },
+    "0,18": {
+      "weight": 1.8385462723808943,
+      "enabled": true
+    },
+    "11,19": {
+      "weight": 0.4244436740094215,
+      "enabled": true
+    },
+    "14,19": {
+      "weight": -2.475513386782914,
+      "enabled": false
+    },
+    "11,15": {
+      "weight": -2.8458688047877954,
+      "enabled": true
+    },
+    "8,15": {
+      "weight": 1.484966515012276,
+      "enabled": false
+    },
+    "0,16": {
+      "weight": 8.014655598788423,
+      "enabled": true
+    },
+    "21,19": {
+      "weight": -4.8226772348862434,
+      "enabled": true
+    },
+    "21,20": {
+      "weight": -1.6358994169822,
+      "enabled": true
+    },
+    "8,16": {
+      "weight": -0.3626979765802154,
+      "enabled": true
+    },
+    "6,18": {
+      "weight": -8.108810688175092,
+      "enabled": true
+    },
+    "5,19": {
+      "weight": -1.7793280156456828,
+      "enabled": false
+    },
+    "0,15": {
+      "weight": 7.007890580816785,
+      "enabled": true
+    },
+    "3,20": {
+      "weight": -0.5650952245284664,
+      "enabled": true
+    },
+    "4,18": {
+      "weight": 2.4901562670857285,
+      "enabled": true
+    },
+    "3,19": {
+      "weight": -8.948193319390384,
+      "enabled": true
+    },
+    "6,17": {
+      "weight": -0.23497034612282475,
+      "enabled": true
+    },
+    "2,15": {
+      "weight": 7.545811328430803,
+      "enabled": true
+    },
+    "7,21": {
+      "weight": 0.27679814894638866,
+      "enabled": true
+    },
+    "13,21": {
+      "weight": -0.9684702211415956,
+      "enabled": true
+    },
+    "1,21": {
+      "weight": -7.942045455989413,
+      "enabled": true
+    },
+    "13,16": {
+      "weight": -0.11895241868451478,
+      "enabled": true
+    },
+    "10,21": {
+      "weight": -0.7019500425236822,
+      "enabled": true
+    },
+    "8,21": {
+      "weight": -0.49101632127372197,
+      "enabled": true
+    },
+    "9,18": {
+      "weight": -0.19948919866925485,
+      "enabled": true
+    },
+    "2,16": {
+      "weight": -0.4968597168061617,
+      "enabled": true
+    },
+    "9,15": {
+      "weight": 0.09890346243079073,
+      "enabled": true
+    },
+    "11,21": {
+      "weight": 0.948689825046529,
+      "enabled": true
+    },
+    "12,22": {
+      "weight": -1.7043483368717567,
+      "enabled": true
+    },
+    "22,20": {
+      "weight": 1.0,
+      "enabled": true
+    },
+    "9,19": {
+      "weight": 0.7418445384853161,
+      "enabled": true
+    },
+    "12,18": {
+      "weight": -0.1416953540781043,
+      "enabled": true
+    },
+    "10,20": {
+      "weight": -0.2718252643653858,
+      "enabled": true
+    },
+    "3,21": {
+      "weight": -2.0714338672589307,
+      "enabled": true
+    },
+    "8,19": {
+      "weight": -4.310960915152,
+      "enabled": true
+    },
+    "5,17": {
+      "weight": -0.34592888027641977,
+      "enabled": true
+    },
+    "7,18": {
+      "weight": -0.1367830699103567,
+      "enabled": true
+    },
+    "5,20": {
+      "weight": 0.4442848511003368,
+      "enabled": true
+    }
+  },
+  "id": 1141342329
+}
