@@ -16,52 +16,11 @@ class Visualization:
     def __init__(self, save_folder: str):
         self.save_folder = save_folder
 
-    def visualize_network(self, network: NeuralNetwork, axis: Axis, filename: str, title: str = None, save_image: bool = False, show_image: bool = True) -> None:
+    def visualize_network(self, network: NeuralNetwork, axis: Axis, filename: str, title: str = None,
+                          save_image: bool = False, show_image: bool = True) -> None:
         """
-        Visualize a NEAT-style neural network using NetworkX and Matplotlib.
-
-        The network is drawn with:
-        - Input nodes aligned on the left,
-        - Hidden nodes in the center,
-        - Output nodes on the right,
-        with directed edges representing enabled connections.
-
-        Each node is color-coded by type:
-            input  - sky blue
-            hidden - orange
-            output - light green
-
-        Edge labels display connection weights.
-
-        Parameters
-        ----------
-        network : NeuralNetwork
-            The neural network object to visualize. It must provide:
-                - `network.nodes`: dict mapping node_id → node_type
-                    where node_type ∈ {"input", "hidden", "output"}.
-                - `network.connections`: dict mapping (src, tgt) → {"enabled": bool, "weight": float}
-
-        axis : matplotlib.axes.Axes
-            The axes to draw the network on.
-
-        filename : str
-            The base filename used when saving the visualization image.
-            The file will be saved to `visualizations/<filename>.png`.
-
-        title : str, optional (default=None)
-            Title for the plot. If None, a default title showing the number of individuals
-            and species will be used.
-
-        save_image : bool, optional (default=False)
-            If True, the image is saved using `plt.savefig()`.
-
-        show_image : bool, optional (default=True)
-            If True, displays the visualization in a Matplotlib window.
-
-        Returns
-        -------
-        None
-            The function only draws the plot, optionally saves or shows it, and does not return anything.
+        Visualize a NEAT-style neural network with edge thickness proportional to |weight|
+        and color indicating sign (red=negative, green=positive).
         """
 
         axis.clear()
@@ -77,7 +36,7 @@ class Visualization:
         for node_id, node_type in network.nodes.items():
             G.add_node(node_id, label=node_type)
 
-        # Add edges
+        # Add edges (only enabled)
         for (src, tgt), conn in network.connections.items():
             if conn["enabled"]:
                 G.add_edge(src, tgt, weight=conn["weight"])
@@ -95,7 +54,7 @@ class Visualization:
         for i, node_id in enumerate(sorted(layers["output"])):
             pos[node_id] = (2, -i)
 
-        # Colors
+        # Node colors
         node_colors = []
         for node_id in G.nodes:
             t = network.nodes[node_id]
@@ -106,9 +65,31 @@ class Visualization:
             else:
                 node_colors.append("orange")
 
-        # Draw
+        # Edge colors and widths
+        edges = G.edges(data=True)
+        edge_weights = [abs(d['weight']) for u, v, d in edges]
+
+        max_width = 2.4
+        min_width = 0.8
+        widths = []
+        edge_colors = []
+
+        max_weight = max(edge_weights) if edge_weights else 1
+        for u, v, d in edges:
+            w_abs = abs(d['weight'])
+            width = min_width + (w_abs / max_weight) * (max_width - min_width)
+            widths.append(width)
+
+            if d['weight'] >= 0:
+                intensity = 0.3 + 0.7 * min(1.0, d['weight'] / max_weight)
+                edge_colors.append((0.2, intensity, 0.2))
+            else:
+                intensity = 0.3 + 0.7 * min(1.0, abs(d['weight']) / max_weight)
+                edge_colors.append((intensity, 0.2, 0.2))
+
+        # Draw network
         nx.draw_networkx_nodes(G, pos, node_color=node_colors, node_size=700, ax=axis)
-        nx.draw_networkx_edges(G, pos, arrowstyle="->", arrowsize=14, ax=axis)
+        nx.draw_networkx_edges(G, pos, arrowstyle="-", arrowsize=14, width=widths, edge_color=edge_colors, ax=axis)
         nx.draw_networkx_labels(
             G, pos,
             {n: f"{n}\n{network.nodes[n]}" for n in G.nodes},
@@ -116,11 +97,7 @@ class Visualization:
             ax=axis
         )
 
-        # Edge labels (weights)
-        edge_labels = {(u, v): f"{d['weight']:.2f}" for u, v, d in G.edges(data=True)}
-        nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=7, ax=axis)
-
-        # Saving
+        # Save
         file = Path(self.save_folder, f"{filename}.png")
         if save_image:
             file.parent.mkdir(parents=True, exist_ok=True)
