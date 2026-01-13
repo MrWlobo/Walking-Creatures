@@ -1,0 +1,78 @@
+{
+  "nodes": {
+    "0": "input",
+    "1": "input",
+    "2": "input",
+    "3": "input",
+    "4": "input",
+    "5": "input",
+    "6": "input",
+    "7": "input",
+    "8": "input",
+    "9": "input",
+    "10": "input",
+    "11": "input",
+    "12": "input",
+    "13": "input",
+    "14": "input",
+    "15": "input",
+    "16": "input",
+    "17": "input",
+    "18": "input",
+    "19": "input",
+    "20": "input",
+    "21": "input",
+    "22": "input",
+    "23": "input",
+    "24": "input",
+    "25": "input",
+    "26": "input",
+    "27": "output",
+    "28": "output",
+    "29": "output",
+    "30": "output",
+    "31": "output",
+    "32": "output",
+    "33": "output",
+    "34": "output",
+    "35": "output",
+    "36": "output",
+    "37": "output",
+    "38": "output"
+  },
+  "connections": {
+    "24,37": {
+      "weight": -7.710206406450542,
+      "enabled": true
+    },
+    "0,29": {
+      "weight": -4.807316194884368,
+      "enabled": true
+    },
+    "21,34": {
+      "weight": 5.530324059890027,
+      "enabled": true
+    },
+    "26,33": {
+      "weight": 7.128929971943975,
+      "enabled": true
+    },
+    "16,34": {
+      "weight": 9.398600962784194,
+      "enabled": true
+    },
+    "1,28": {
+      "weight": 3.8677443277952133,
+      "enabled": true
+    },
+    "20,28": {
+      "weight": -0.398866638403613,
+      "enabled": true
+    },
+    "22,32": {
+      "weight": -0.005466392950377097,
+      "enabled": true
+    }
+  },
+  "id": 3261477024
+}

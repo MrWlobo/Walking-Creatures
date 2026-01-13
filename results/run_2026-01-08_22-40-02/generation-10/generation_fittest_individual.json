@@ -1,0 +1,108 @@
+{
+  "nodes": {
+    "0": "input",
+    "1": "input",
+    "2": "input",
+    "3": "input",
+    "4": "input",
+    "5": "input",
+    "6": "input",
+    "7": "input",
+    "8": "input",
+    "9": "input",
+    "10": "input",
+    "11": "input",
+    "12": "input",
+    "13": "input",
+    "14": "input",
+    "15": "input",
+    "16": "input",
+    "17": "input",
+    "18": "input",
+    "19": "input",
+    "20": "input",
+    "21": "input",
+    "22": "input",
+    "23": "input",
+    "24": "input",
+    "25": "input",
+    "26": "input",
+    "27": "output",
+    "28": "output",
+    "29": "output",
+    "30": "output",
+    "31": "output",
+    "32": "output",
+    "33": "output",
+    "34": "output",
+    "35": "output",
+    "36": "output",
+    "37": "output",
+    "38": "output",
+    "39": "hidden",
+    "40": "hidden"
+  },
+  "connections": {
+    "18,28": {
+      "weight": 7.77110882878263,
+      "enabled": true
+    },
+    "17,32": {
+      "weight": 9.001936082816378,
+      "enabled": true
+    },
+    "7,36": {
+      "weight": -6.933683130578453,
+      "enabled": true
+    },
+    "18,38": {
+      "weight": -7.96639690694742,
+      "enabled": false
+    },
+    "0,29": {
+      "weight": 8.288610592878218,
+      "enabled": true
+    },
+    "10,34": {
+      "weight": 0.4093330187461355,
+      "enabled": false
+    },
+    "18,39": {
+      "weight": 1.5479731526435927,
+      "enabled": true
+    },
+    "39,38": {
+      "weight": 1.0,
+      "enabled": true
+    },
+    "10,40": {
+      "weight": 0.4093330187461355,
+      "enabled": true
+    },
+    "40,34": {
+      "weight": 1.0,
+      "enabled": true
+    },
+    "13,39": {
+      "weight": -0.1511401995723154,
+      "enabled": true
+    },
+    "13,34": {
+      "weight": -0.7491361943256982,
+      "enabled": true
+    },
+    "8,34": {
+      "weight": -0.5753055926660207,
+      "enabled": true
+    },
+    "1,32": {
+      "weight": -0.6681982294037192,
+      "enabled": true
+    },
+    "39,35": {
+      "weight": -0.5905899518235032,
+      "enabled": true
+    }
+  },
+  "id": 1581162817
+}

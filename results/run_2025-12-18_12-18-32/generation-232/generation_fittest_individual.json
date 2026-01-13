@@ -1,0 +1,388 @@
+{
+  "nodes": {
+    "0": "input",
+    "1": "input",
+    "2": "input",
+    "3": "input",
+    "4": "input",
+    "5": "input",
+    "6": "input",
+    "7": "input",
+    "8": "input",
+    "9": "input",
+    "10": "input",
+    "11": "input",
+    "12": "input",
+    "13": "input",
+    "14": "input",
+    "15": "input",
+    "16": "input",
+    "17": "input",
+    "18": "input",
+    "19": "input",
+    "20": "input",
+    "21": "input",
+    "22": "input",
+    "23": "input",
+    "24": "input",
+    "25": "input",
+    "26": "input",
+    "27": "input",
+    "28": "input",
+    "29": "input",
+    "30": "input",
+    "31": "input",
+    "32": "input",
+    "33": "input",
+    "34": "input",
+    "35": "output",
+    "36": "output",
+    "37": "output",
+    "38": "output",
+    "39": "output",
+    "40": "output",
+    "41": "output",
+    "42": "output",
+    "43": "output",
+    "44": "output",
+    "45": "output",
+    "46": "output",
+    "47": "output",
+    "48": "output",
+    "49": "output",
+    "50": "output",
+    "53": "hidden",
+    "52": "hidden"
+  },
+  "connections": {
+    "28,48": {
+      "weight": 9.055108574812685,
+      "enabled": true
+    },
+    "24,42": {
+      "weight": 9.360091307191261,
+      "enabled": true
+    },
+    "9,45": {
+      "weight": -7.317835402541646,
+      "enabled": false
+    },
+    "7,50": {
+      "weight": 7.221635972498632,
+      "enabled": true
+    },
+    "2,37": {
+      "weight": 2.749980824725564,
+      "enabled": true
+    },
+    "12,44": {
+      "weight": 8.532644182662807,
+      "enabled": true
+    },
+    "8,46": {
+      "weight": 5.361744403158921,
+      "enabled": true
+    },
+    "23,40": {
+      "weight": -3.6452247089081196,
+      "enabled": true
+    },
+    "5,49": {
+      "weight": -2.04747572401496,
+      "enabled": true
+    },
+    "20,39": {
+      "weight": -7.4497147693416075,
+      "enabled": true
+    },
+    "32,45": {
+      "weight": 8.063264657079683,
+      "enabled": true
+    },
+    "11,50": {
+      "weight": -8.609559181235399,
+      "enabled": true
+    },
+    "21,49": {
+      "weight": -9.472658793630249,
+      "enabled": true
+    },
+    "9,53": {
+      "weight": -3.5785480898531787,
+      "enabled": true
+    },
+    "53,45": {
+      "weight": 5.940782185746674,
+      "enabled": true
+    },
+    "23,50": {
+      "weight": -7.742614034071227,
+      "enabled": true
+    },
+    "17,49": {
+      "weight": -0.48985166400496993,
+      "enabled": true
+    },
+    "20,37": {
+      "weight": 5.4003300327837,
+      "enabled": true
+    },
+    "1,48": {
+      "weight": -15.839693558816512,
+      "enabled": true
+    },
+    "15,37": {
+      "weight": 3.095348635570381,
+      "enabled": true
+    },
+    "12,47": {
+      "weight": 1.5555569064631392,
+      "enabled": true
+    },
+    "15,44": {
+      "weight": 9.077997442728535,
+      "enabled": true
+    },
+    "26,42": {
+      "weight": 5.123432776795664,
+      "enabled": true
+    },
+    "4,38": {
+      "weight": 0.953560019981901,
+      "enabled": true
+    },
+    "53,36": {
+      "weight": -5.730115168042671,
+      "enabled": true
+    },
+    "26,47": {
+      "weight": -0.890272254762017,
+      "enabled": true
+    },
+    "1,53": {
+      "weight": 0.4870333281578736,
+      "enabled": true
+    },
+    "34,48": {
+      "weight": -0.00921305285945806,
+      "enabled": true
+    },
+    "25,39": {
+      "weight": 1.2580061140520555,
+      "enabled": true
+    },
+    "24,50": {
+      "weight": -1.0213449231666336,
+      "enabled": true
+    },
+    "13,50": {
+      "weight": -9.749849760405844,
+      "enabled": true
+    },
+    "6,48": {
+      "weight": 6.8016293561411,
+      "enabled": true
+    },
+    "33,39": {
+      "weight": -0.047823468709419004,
+      "enabled": false
+    },
+    "26,46": {
+      "weight": 9.1479284960533,
+      "enabled": true
+    },
+    "30,43": {
+      "weight": 0.6977301307196089,
+      "enabled": true
+    },
+    "27,41": {
+      "weight": 0.4343400180633685,
+      "enabled": true
+    },
+    "8,43": {
+      "weight": -2.5883439385587934,
+      "enabled": true
+    },
+    "29,44": {
+      "weight": 0.8417157435850999,
+      "enabled": true
+    },
+    "4,46": {
+      "weight": 0.6978721836039092,
+      "enabled": true
+    },
+    "18,41": {
+      "weight": 0.7068008945182651,
+      "enabled": false
+    },
+    "21,36": {
+      "weight": -0.9116832747226535,
+      "enabled": true
+    },
+    "15,52": {
+      "weight": 9.910090296469756,
+      "enabled": true
+    },
+    "52,44": {
+      "weight": 0.46024862035222114,
+      "enabled": true
+    },
+    "19,35": {
+      "weight": 0.6107214202752551,
+      "enabled": true
+    },
+    "16,53": {
+      "weight": 1.4148484577676326,
+      "enabled": true
+    },
+    "27,43": {
+      "weight": 4.555145844278702,
+      "enabled": true
+    },
+    "12,41": {
+      "weight": -2.7264392686539254,
+      "enabled": true
+    },
+    "3,50": {
+      "weight": -2.527192696185285,
+      "enabled": true
+    },
+    "31,52": {
+      "weight": -0.6581337587543232,
+      "enabled": true
+    },
+    "28,53": {
+      "weight": 9.655317273836602,
+      "enabled": true
+    },
+    "0,48": {
+      "weight": -0.39398938251226867,
+      "enabled": true
+    },
+    "12,49": {
+      "weight": 2.9355303715564594,
+      "enabled": true
+    },
+    "14,41": {
+      "weight": -0.7893062675220079,
+      "enabled": true
+    },
+    "3,46": {
+      "weight": 0.8678041223751227,
+      "enabled": true
+    },
+    "21,53": {
+      "weight": -2.5785186196125824,
+      "enabled": true
+    },
+    "34,52": {
+      "weight": -1.389463055808385,
+      "enabled": true
+    },
+    "28,47": {
+      "weight": -0.41208469101015877,
+      "enabled": true
+    },
+    "23,46": {
+      "weight": 0.6954489745040917,
+      "enabled": true
+    },
+    "26,40": {
+      "weight": -0.5185628593002587,
+      "enabled": true
+    },
+    "8,48": {
+      "weight": 0.12972862703173282,
+      "enabled": true
+    },
+    "6,52": {
+      "weight": 2.062802811415541,
+      "enabled": true
+    },
+    "19,46": {
+      "weight": 0.5783141817648179,
+      "enabled": true
+    },
+    "19,38": {
+      "weight": 0.5958995136492502,
+      "enabled": true
+    },
+    "3,42": {
+      "weight": 0.9101285006732049,
+      "enabled": true
+    },
+    "23,39": {
+      "weight": -0.8008517746200801,
+      "enabled": true
+    },
+    "11,35": {
+      "weight": -0.17117169390738507,
+      "enabled": true
+    },
+    "34,41": {
+      "weight": 0.25299615063964476,
+      "enabled": true
+    },
+    "15,42": {
+      "weight": 0.6368882461024188,
+      "enabled": false
+    },
+    "4,37": {
+      "weight": -0.7163468506136934,
+      "enabled": true
+    },
+    "15,53": {
+      "weight": 3.021446788257986,
+      "enabled": true
+    },
+    "53,42": {
+      "weight": 1.7842441024014248,
+      "enabled": true
+    },
+    "16,37": {
+      "weight": 0.34173558194901954,
+      "enabled": true
+    },
+    "11,44": {
+      "weight": 0.3732314566323973,
+      "enabled": true
+    },
+    "25,47": {
+      "weight": -0.5107971847063288,
+      "enabled": true
+    },
+    "20,36": {
+      "weight": 0.3767485936815902,
+      "enabled": true
+    },
+    "53,38": {
+      "weight": -0.6027953650241502,
+      "enabled": true
+    },
+    "26,36": {
+      "weight": -0.5825999600925493,
+      "enabled": true
+    },
+    "1,44": {
+      "weight": 0.3093966789166014,
+      "enabled": true
+    },
+    "4,47": {
+      "weight": 0.8044331322891618,
+      "enabled": true
+    },
+    "6,53": {
+      "weight": -0.20152982780499018,
+      "enabled": true
+    },
+    "26,48": {
+      "weight": -0.07795122148447087,
+      "enabled": true
+    },
+    "11,41": {
+      "weight": 0.4545189991322074,
+      "enabled": true
+    }
+  },
+  "id": 3127258799
+}

@@ -1,0 +1,37 @@
+{
+    "creature_path": "assets\\creatures\\4-spherical_4-revolute_spider-bot.urdf",
+    "results_path": "results",
+    "fitness": "AbsXDistanceStabilityFitness(stability_coefficient=0.001)",
+    "selection": "TournamentSelection(tournament_size=5)",
+    "state_getter": "BaseAndFullJointStateGetter()",
+    "run_conditions": "FallOrTimeoutRunConditions(max_time_seconds=10, height_threshold=0.3)",
+    "population_size": 1000,
+    "n_generations": 1500,
+    "initial_connections": 12,
+    "succession_ratio": 0.0,
+    "genetic_operation_ratios": "lambda  i: (0.0, 1.0) if i < 20 else (softmax([0.004*i, 1]) if i < 450 else (0.7, 0.3",
+    "mutation_type_percentages": [
+        60,
+        37.5,
+        2.5
+    ],
+    "weight_mutation_params": [
+        0.6,
+        -2.2,
+        2.2,
+        -10.0,
+        10.0
+    ],
+    "mutation_after_crossover_probability": 0.15,
+    "indiv_output_scale": 7.5,
+    "speciation_coefficients": [
+        1.5,
+        1.2,
+        0.04
+    ],
+    "speciation_compatibility_distance": 1.2,
+    "surface_friction": 0.7,
+    "n_processes": null,
+    "time_step": 0.004166666666666667,
+    "settle_steps": 120
+}
