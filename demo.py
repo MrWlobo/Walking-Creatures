@@ -9,8 +9,8 @@ from simulation.simulation import Simulation
 
 if __name__ == "__main__":
     # SETTINGS
-    RUN_NAME: str = "run_2025-12-05_18-52-44"
-    GENERATION: int = 0
+    RUN_NAME: str = "run_2026-01-05_21-36-23"
+    GENERATION: int = 440
     ###
     
     
@@ -23,5 +23,4 @@ if __name__ == "__main__":
     indiv = deserialize_network(indiv_path)
     
     sim = Simulation(p.GUI, params.creature_path, params.surface_friction, params.settle_steps, params.time_step)
-    
     run_individual(indiv, sim, params)

@@ -25,10 +25,10 @@ if __name__ == "__main__":
         state_getter=BaseAndFullJointStateGetter(),
         run_conditions=FallOrTimeoutRunConditions(max_time_seconds=10, height_threshold=0.4),
         
-        population_size=1000,
+        population_size=10,
         n_generations=500,
         
-        initial_connections=4,
+        initial_connections=40,
         
         succession_ratio=0.0,
         genetic_operation_ratios=lambda i: (0.0, 1.0) if i < 20 else (softmax([0.01*i, 1]) if i < 184 else (0.7, 0.3)),
