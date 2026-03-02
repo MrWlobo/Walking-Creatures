@@ -31,6 +31,8 @@ The underlying algorithm relies on a custom NEAT implementation that features dy
 The algorithm was tested on different creature morphologies:
 1. **Biped**: A two-legged model featuring 6 joints, each with 1 Degree of Freedom (DOF).
 2. **Spider Bot**: A multi-legged model featuring a mix of 4 1-DOF joints and 4 3-DOF joints.
+3. **Single-Joint Model**: Composed of two spheres connected by a single 3-DOF joint. Despite its structural simplicity, it proved highly difficult to balance, ultimately yielding worse results than the bipedal model even after ~48 hours of training.
+4. **Quadruped**: Features a spherical body and four limbs, each connected by a single 3-DOF joint. It successfully traveled over 1 meter, though its low torso height prevented the use of a stability-based fitness function.
 
 ---
 
@@ -68,3 +70,4 @@ pip install -r requirements.txt
 ## Authors
 - Kacper Dłubała
 - Michał Dworniczak
+
