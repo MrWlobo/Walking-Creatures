@@ -1,0 +1,45 @@
+{
+  "nodes": {
+    "0": "input",
+    "1": "input",
+    "2": "input",
+    "3": "input",
+    "4": "input",
+    "5": "input",
+    "6": "input",
+    "7": "input",
+    "8": "input",
+    "9": "input",
+    "10": "input",
+    "11": "input",
+    "12": "output",
+    "13": "output",
+    "14": "output",
+    "15": "output",
+    "16": "output",
+    "17": "output"
+  },
+  "connections": {
+    "3,12": {
+      "weight": 5.832907767413387,
+      "enabled": true
+    },
+    "9,16": {
+      "weight": 5.325433463222325,
+      "enabled": true
+    },
+    "5,15": {
+      "weight": 3.3329748878692236,
+      "enabled": true
+    },
+    "0,17": {
+      "weight": 9.94018670429595,
+      "enabled": true
+    },
+    "10,14": {
+      "weight": 1.238527684313206,
+      "enabled": true
+    }
+  },
+  "id": 1058258275
+}
