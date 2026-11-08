@@ -64,7 +64,7 @@ git clone [https://github.com/MrWlobo/Walking-Creatures.git](https://github.com/
 cd Walking-Creatures
 
 # Install dependencies
-pip install -r requirements.txt
+uv sync
 ```
 
 ## Authors
